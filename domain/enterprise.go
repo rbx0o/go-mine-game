@@ -16,10 +16,27 @@ import "context"
 
 ==================================================*/
 type Enterprise struct {
-	balance       Coal            // Баланс угля
-	passiveIncome Coal            // Пассивный доход угля в секунду
-	ctx           context.Context // Контекст выполнения горутин
+	balance       Coal // Баланс угля
+	passiveIncome Coal // Пассивный доход угля в секунду
+
+	ctx       context.Context    // Контекст выполнения горутин
+	ctxCancel context.CancelFunc // Функция завершения контекста
 
 	activeMiners   map[int]Miner // Работающие в данный момент шахтёры
 	inactiveMiners map[int]Miner // Шахтёры завершившие работу
+}
+
+func InitEnterprise() *Enterprise {
+	tempCtx, tempCtxCancel := context.WithCancel(context.Background())
+
+	return &Enterprise{
+		balance:       0,
+		passiveIncome: 1,
+
+		ctx:       tempCtx,
+		ctxCancel: tempCtxCancel,
+
+		activeMiners:   make(map[int]Miner),
+		inactiveMiners: make(map[int]Miner),
+	}
 }
