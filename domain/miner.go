@@ -56,12 +56,12 @@ type Miner interface {
 //==================================================
 
 type MinerInfo struct {
-	energyLeft int // Сколько энергии осталось
+	EnergyLeft int // Сколько энергии осталось
 }
 
 func InitMinerInfo(energy int) MinerInfo {
 	return MinerInfo{
-		energyLeft: energy,
+		EnergyLeft: energy,
 	}
 }
 
@@ -107,7 +107,7 @@ func (m *SmallMiner) Run(ctx context.Context) <-chan Coal {
 				ch <- m.coalCount
 
 				m.mtx.Lock()
-				m.info.energyLeft--
+				m.info.EnergyLeft--
 				m.mtx.Unlock()
 			}
 		}
@@ -158,7 +158,7 @@ func (m *NormalMiner) Run(ctx context.Context) <-chan Coal {
 				ch <- m.coalCount
 
 				m.mtx.Lock()
-				m.info.energyLeft--
+				m.info.EnergyLeft--
 				m.mtx.Unlock()
 			}
 		}
@@ -212,7 +212,7 @@ func (m *StrongMiner) Run(ctx context.Context) <-chan Coal {
 				ch <- m.coalCount
 
 				m.mtx.Lock()
-				m.info.energyLeft--
+				m.info.EnergyLeft--
 				m.coalCount += m.progress
 				m.mtx.Unlock()
 			}

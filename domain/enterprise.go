@@ -2,9 +2,13 @@ package domain
 
 // Файл в котором будет описано предприятие и базовая логика
 
-import "context"
+import (
+	"context"
+	"sync"
+)
 
-/*==================================================
+/*
+==================================================
 
 Есть структура, которая представляет из себя предприятие
 Структура хранит в себе информацию о:
@@ -14,29 +18,32 @@ import "context"
 - списке активных шахтёров
 - списке неактивных шахтёров
 
-==================================================*/
+==================================================
+*/
 type Enterprise struct {
-	balance       Coal // Баланс угля
-	passiveIncome Coal // Пассивный доход угля в секунду
+	Balance       Coal // Баланс угля
+	PassiveIncome Coal // Пассивный доход угля в секунду
 
-	ctx       context.Context    // Контекст выполнения горутин
-	ctxCancel context.CancelFunc // Функция завершения контекста
+	Ctx       context.Context    // Контекст выполнения горутин
+	CtxCancel context.CancelFunc // Функция завершения контекста
 
-	activeMiners   map[int]Miner // Работающие в данный момент шахтёры
-	inactiveMiners map[int]Miner // Шахтёры завершившие работу
+	ActiveMiners   map[int]Miner // Работающие в данный момент шахтёры
+	InactiveMiners map[int]Miner // Шахтёры завершившие работу
+
+	Mtx sync.Mutex
 }
 
 func InitEnterprise() *Enterprise {
 	tempCtx, tempCtxCancel := context.WithCancel(context.Background())
 
 	return &Enterprise{
-		balance:       0,
-		passiveIncome: 1,
+		Balance:       0,
+		PassiveIncome: 1,
 
-		ctx:       tempCtx,
-		ctxCancel: tempCtxCancel,
+		Ctx:       tempCtx,
+		CtxCancel: tempCtxCancel,
 
-		activeMiners:   make(map[int]Miner),
-		inactiveMiners: make(map[int]Miner),
+		ActiveMiners:   make(map[int]Miner),
+		InactiveMiners: make(map[int]Miner),
 	}
 }
