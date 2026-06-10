@@ -10,6 +10,19 @@ package domain
 при надобности можно было бы переделать его в нужную
 структуру.
 
+Подобным образом создан тип данных для оборудования.
+И реализованы константы (подобие enum).
+
 ==================================================*/
 
 type Coal int
+
+//==================================================
+
+type EquipmentType string
+
+const (
+	PickaxeType     EquipmentType = "pickaxe"
+	VentilationType EquipmentType = "ventilation"
+	TrolleysType    EquipmentType = "trolleys"
+)

@@ -30,11 +30,18 @@ type Enterprise struct {
 	ActiveMiners   map[int]Miner // Работающие в данный момент шахтёры
 	InactiveMiners map[int]Miner // Шахтёры завершившие работу
 
+	AllEquipment map[string]Equipment // Всё оборудование на предприятии
+
 	Mtx sync.Mutex
 }
 
 func InitEnterprise() *Enterprise {
 	tempCtx, tempCtxCancel := context.WithCancel(context.Background())
+
+	tempAllEquipment := make(map[string]Equipment, 3)
+	tempAllEquipment["pickaxe"] = InitPickaxe()
+	tempAllEquipment["ventilation"] = InitVentilation()
+	tempAllEquipment["trolleys"] = InitTrolleys()
 
 	return &Enterprise{
 		Balance:       0,
@@ -45,5 +52,7 @@ func InitEnterprise() *Enterprise {
 
 		ActiveMiners:   make(map[int]Miner),
 		InactiveMiners: make(map[int]Miner),
+
+		AllEquipment: tempAllEquipment,
 	}
 }
