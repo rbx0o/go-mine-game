@@ -16,6 +16,8 @@ package domain
 
 type Equipment interface {
 	Buy()
+	Cost() Coal
+	IsBought() bool
 }
 
 //==================================================
@@ -36,6 +38,14 @@ func (p *Pickaxe) Buy() {
 	p.isBought = true
 }
 
+func (p *Pickaxe) Cost() Coal {
+	return p.cost
+}
+
+func (p *Pickaxe) IsBought() bool {
+	return p.isBought
+}
+
 //==================================================
 
 type Ventilation struct {
@@ -54,6 +64,14 @@ func (v *Ventilation) Buy() {
 	v.isBought = true
 }
 
+func (v *Ventilation) Cost() Coal {
+	return v.cost
+}
+
+func (v *Ventilation) IsBought() bool {
+	return v.isBought
+}
+
 //==================================================
 
 type Trolleys struct {
@@ -70,4 +88,12 @@ func InitTrolleys() *Trolleys {
 
 func (t *Trolleys) Buy() {
 	t.isBought = true
+}
+
+func (t *Trolleys) Cost() Coal {
+	return t.cost
+}
+
+func (t *Trolleys) IsBought() bool {
+	return t.isBought
 }
