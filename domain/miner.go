@@ -51,6 +51,17 @@ type Miner interface {
 		По сути просто возвращает копию поля info шахтёра
 	*/
 	GetInfo() MinerInfo
+
+	GetTypeInfo() MinerTypeInfo
+}
+
+//==================================================
+
+type MinerTypeInfo struct {
+	Salary    Coal
+	Energy    int
+	CoalCount Coal
+	Timeout   time.Duration
 }
 
 //==================================================
@@ -116,6 +127,15 @@ func (m *SmallMiner) Run(ctx context.Context) <-chan Coal {
 	return ch
 }
 
+func (m *SmallMiner) GetTypeInfo() MinerTypeInfo {
+	return MinerTypeInfo{
+		Salary:    m.salary,
+		Energy:    m.energy,
+		CoalCount: m.coalCount,
+		Timeout:   m.timeout,
+	}
+}
+
 //==================================================
 
 type NormalMiner struct {
@@ -165,6 +185,15 @@ func (m *NormalMiner) Run(ctx context.Context) <-chan Coal {
 	}()
 
 	return ch
+}
+
+func (m *NormalMiner) GetTypeInfo() MinerTypeInfo {
+	return MinerTypeInfo{
+		Salary:    m.salary,
+		Energy:    m.energy,
+		CoalCount: m.coalCount,
+		Timeout:   m.timeout,
+	}
 }
 
 //==================================================
@@ -220,4 +249,13 @@ func (m *StrongMiner) Run(ctx context.Context) <-chan Coal {
 	}()
 
 	return ch
+}
+
+func (m *StrongMiner) GetTypeInfo() MinerTypeInfo {
+	return MinerTypeInfo{
+		Salary:    m.salary,
+		Energy:    m.energy,
+		CoalCount: m.coalCount,
+		Timeout:   m.timeout,
+	}
 }

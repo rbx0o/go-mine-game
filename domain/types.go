@@ -26,3 +26,13 @@ const (
 	VentilationType EquipmentType = "ventilation"
 	TrolleysType    EquipmentType = "trolleys"
 )
+
+//==================================================
+
+type MinerType string
+
+const (
+	SmallMinerType  MinerType = "small_miner"
+	NormalMinerType MinerType = "normal_miner"
+	StrongMinerType MinerType = "strong_miner"
+)
