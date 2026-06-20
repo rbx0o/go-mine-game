@@ -23,3 +23,16 @@ func (g *GameService) BuyEquipment(equipment domain.EquipmentType) error {
 	g.enterprise.AllEquipment[equipment].Buy()
 	return nil
 }
+
+/*
+GetEquipmentTypes возвращает информацию о всех типах доступного оборудования
+*/
+func (g *GameService) GetEquipmentTypesInfo() map[domain.EquipmentType]domain.EquipmentInfo {
+	equipmentTypeMap := make(map[domain.EquipmentType]domain.EquipmentInfo, 3)
+
+	equipmentTypeMap[domain.PickaxeType] = g.enterprise.AllEquipment[domain.PickaxeType].GetInfo()
+	equipmentTypeMap[domain.VentilationType] = g.enterprise.AllEquipment[domain.VentilationType].GetInfo()
+	equipmentTypeMap[domain.TrolleysType] = g.enterprise.AllEquipment[domain.TrolleysType].GetInfo()
+
+	return equipmentTypeMap
+}

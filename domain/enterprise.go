@@ -39,9 +39,9 @@ func InitEnterprise() *Enterprise {
 	tempCtx, tempCtxCancel := context.WithCancel(context.Background())
 
 	tempAllEquipment := make(map[EquipmentType]Equipment, 3)
-	tempAllEquipment["pickaxe"] = InitPickaxe()
-	tempAllEquipment["ventilation"] = InitVentilation()
-	tempAllEquipment["trolleys"] = InitTrolleys()
+	tempAllEquipment[PickaxeType] = InitPickaxe()
+	tempAllEquipment[VentilationType] = InitVentilation()
+	tempAllEquipment[TrolleysType] = InitTrolleys()
 
 	return &Enterprise{
 		Balance:       0,

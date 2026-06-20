@@ -18,6 +18,12 @@ type Equipment interface {
 	Buy()
 	Cost() Coal
 	IsBought() bool
+	GetInfo() EquipmentInfo
+}
+
+type EquipmentInfo struct {
+	Name string
+	Cost Coal
 }
 
 //==================================================
@@ -46,6 +52,13 @@ func (p *Pickaxe) IsBought() bool {
 	return p.isBought
 }
 
+func (p *Pickaxe) GetInfo() EquipmentInfo {
+	return EquipmentInfo{
+		Name: "Кирка",
+		Cost: p.cost,
+	}
+}
+
 //==================================================
 
 type Ventilation struct {
@@ -72,6 +85,13 @@ func (v *Ventilation) IsBought() bool {
 	return v.isBought
 }
 
+func (v *Ventilation) GetInfo() EquipmentInfo {
+	return EquipmentInfo{
+		Name: "Вентиляция",
+		Cost: v.cost,
+	}
+}
+
 //==================================================
 
 type Trolleys struct {
@@ -96,4 +116,11 @@ func (t *Trolleys) Cost() Coal {
 
 func (t *Trolleys) IsBought() bool {
 	return t.isBought
+}
+
+func (t *Trolleys) GetInfo() EquipmentInfo {
+	return EquipmentInfo{
+		Name: "Вагонетка",
+		Cost: t.cost,
+	}
 }
