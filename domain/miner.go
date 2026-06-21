@@ -51,17 +51,6 @@ type Miner interface {
 		По сути просто возвращает копию поля info шахтёра
 	*/
 	GetInfo() MinerInfo
-
-	GetTypeInfo() MinerTypeInfo
-}
-
-//==================================================
-
-type MinerTypeInfo struct {
-	Salary    Coal
-	Energy    int
-	CoalCount Coal
-	Timeout   time.Duration
 }
 
 //==================================================
@@ -89,11 +78,11 @@ type SmallMiner struct {
 
 func InitSmallMiner() *SmallMiner {
 	return &SmallMiner{
-		salary:    5,
-		energy:    30,
-		coalCount: 1,
-		timeout:   3 * time.Second,
-		info:      InitMinerInfo(30),
+		salary:    MinerConfigs[SmallMinerType].salary,
+		energy:    MinerConfigs[SmallMinerType].energy,
+		coalCount: MinerConfigs[SmallMinerType].coalCount,
+		timeout:   MinerConfigs[SmallMinerType].timeout,
+		info:      InitMinerInfo(MinerConfigs[SmallMinerType].energy),
 	}
 }
 
@@ -127,15 +116,6 @@ func (m *SmallMiner) Run(ctx context.Context) <-chan Coal {
 	return ch
 }
 
-func (m *SmallMiner) GetTypeInfo() MinerTypeInfo {
-	return MinerTypeInfo{
-		Salary:    m.salary,
-		Energy:    m.energy,
-		CoalCount: m.coalCount,
-		Timeout:   m.timeout,
-	}
-}
-
 //==================================================
 
 type NormalMiner struct {
@@ -149,11 +129,11 @@ type NormalMiner struct {
 
 func InitNormalMiner() *NormalMiner {
 	return &NormalMiner{
-		salary:    50,
-		energy:    45,
-		coalCount: 3,
-		timeout:   2 * time.Second,
-		info:      InitMinerInfo(45),
+		salary:    MinerConfigs[NormalMinerType].salary,
+		energy:    MinerConfigs[NormalMinerType].energy,
+		coalCount: MinerConfigs[NormalMinerType].coalCount,
+		timeout:   MinerConfigs[NormalMinerType].timeout,
+		info:      InitMinerInfo(MinerConfigs[NormalMinerType].energy),
 	}
 }
 
@@ -187,15 +167,6 @@ func (m *NormalMiner) Run(ctx context.Context) <-chan Coal {
 	return ch
 }
 
-func (m *NormalMiner) GetTypeInfo() MinerTypeInfo {
-	return MinerTypeInfo{
-		Salary:    m.salary,
-		Energy:    m.energy,
-		CoalCount: m.coalCount,
-		Timeout:   m.timeout,
-	}
-}
-
 //==================================================
 
 type StrongMiner struct {
@@ -210,12 +181,12 @@ type StrongMiner struct {
 
 func InitStrongMiner() *StrongMiner {
 	return &StrongMiner{
-		salary:    450,
-		energy:    60,
-		coalCount: 10,
-		timeout:   1 * time.Second,
-		info:      InitMinerInfo(60),
-		progress:  3,
+		salary:    MinerConfigs[StrongMinerType].salary,
+		energy:    MinerConfigs[StrongMinerType].energy,
+		coalCount: MinerConfigs[StrongMinerType].coalCount,
+		timeout:   MinerConfigs[StrongMinerType].timeout,
+		info:      InitMinerInfo(MinerConfigs[StrongMinerType].energy),
+		progress:  MinerConfigs[StrongMinerType].progress,
 	}
 }
 
@@ -249,13 +220,4 @@ func (m *StrongMiner) Run(ctx context.Context) <-chan Coal {
 	}()
 
 	return ch
-}
-
-func (m *StrongMiner) GetTypeInfo() MinerTypeInfo {
-	return MinerTypeInfo{
-		Salary:    m.salary,
-		Energy:    m.energy,
-		CoalCount: m.coalCount,
-		Timeout:   m.timeout,
-	}
 }
