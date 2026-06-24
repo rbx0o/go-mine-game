@@ -78,11 +78,11 @@ type SmallMiner struct {
 
 func InitSmallMiner() *SmallMiner {
 	return &SmallMiner{
-		salary:    MinerConfigs[SmallMinerType].salary,
-		energy:    MinerConfigs[SmallMinerType].energy,
-		coalCount: MinerConfigs[SmallMinerType].coalCount,
-		timeout:   MinerConfigs[SmallMinerType].timeout,
-		info:      InitMinerInfo(MinerConfigs[SmallMinerType].energy),
+		salary:    minerConfigs[SmallMinerType].Salary,
+		energy:    minerConfigs[SmallMinerType].Energy,
+		coalCount: minerConfigs[SmallMinerType].CoalCount,
+		timeout:   minerConfigs[SmallMinerType].Timeout,
+		info:      InitMinerInfo(minerConfigs[SmallMinerType].Energy),
 	}
 }
 
@@ -129,11 +129,11 @@ type NormalMiner struct {
 
 func InitNormalMiner() *NormalMiner {
 	return &NormalMiner{
-		salary:    MinerConfigs[NormalMinerType].salary,
-		energy:    MinerConfigs[NormalMinerType].energy,
-		coalCount: MinerConfigs[NormalMinerType].coalCount,
-		timeout:   MinerConfigs[NormalMinerType].timeout,
-		info:      InitMinerInfo(MinerConfigs[NormalMinerType].energy),
+		salary:    minerConfigs[NormalMinerType].Salary,
+		energy:    minerConfigs[NormalMinerType].Energy,
+		coalCount: minerConfigs[NormalMinerType].CoalCount,
+		timeout:   minerConfigs[NormalMinerType].Timeout,
+		info:      InitMinerInfo(minerConfigs[NormalMinerType].Energy),
 	}
 }
 
@@ -181,12 +181,12 @@ type StrongMiner struct {
 
 func InitStrongMiner() *StrongMiner {
 	return &StrongMiner{
-		salary:    MinerConfigs[StrongMinerType].salary,
-		energy:    MinerConfigs[StrongMinerType].energy,
-		coalCount: MinerConfigs[StrongMinerType].coalCount,
-		timeout:   MinerConfigs[StrongMinerType].timeout,
-		info:      InitMinerInfo(MinerConfigs[StrongMinerType].energy),
-		progress:  MinerConfigs[StrongMinerType].progress,
+		salary:    minerConfigs[StrongMinerType].Salary,
+		energy:    minerConfigs[StrongMinerType].Energy,
+		coalCount: minerConfigs[StrongMinerType].CoalCount,
+		timeout:   minerConfigs[StrongMinerType].Timeout,
+		info:      InitMinerInfo(minerConfigs[StrongMinerType].Energy),
+		progress:  minerConfigs[StrongMinerType].Progress,
 	}
 }
 
