@@ -44,7 +44,7 @@ type Miner interface {
 		В аргументах принимается контекст работы данной горутины (от предприятия).
 		Возвращается канал, в которой передаётся добытый уголь.
 	*/
-	Run(context.Context) <-chan Coal
+	Run(context.Context, *sync.WaitGroup) <-chan Coal
 
 	/*
 		GetInfo() возвращает информацию о шахтёре.
@@ -56,11 +56,13 @@ type Miner interface {
 //==================================================
 
 type MinerInfo struct {
+	ID         ID  // ID шахтёра
 	EnergyLeft int // Сколько энергии осталось
 }
 
-func InitMinerInfo(energy int) MinerInfo {
+func InitMinerInfo(id ID, energy int) MinerInfo {
 	return MinerInfo{
+		ID:         id,
 		EnergyLeft: energy,
 	}
 }
@@ -68,6 +70,7 @@ func InitMinerInfo(energy int) MinerInfo {
 //==================================================
 
 type SmallMiner struct {
+	ID        ID            // ID шахтёра
 	salary    Coal          // Оплата труда - 5
 	energy    int           // Энергия - 30
 	coalCount Coal          // За одну добычу - 1
@@ -76,14 +79,21 @@ type SmallMiner struct {
 	mtx       sync.Mutex    // Mutex для контроля гонки данных
 }
 
-func InitSmallMiner() *SmallMiner {
+func InitSmallMiner() (*SmallMiner, error) {
+	id, err := NewID()
+
+	if err != nil {
+		return &SmallMiner{}, err
+	}
+
 	return &SmallMiner{
+		ID:        id,
 		salary:    minerConfigs[SmallMinerType].Salary,
 		energy:    minerConfigs[SmallMinerType].Energy,
 		coalCount: minerConfigs[SmallMinerType].CoalCount,
 		timeout:   minerConfigs[SmallMinerType].Timeout,
-		info:      InitMinerInfo(minerConfigs[SmallMinerType].Energy),
-	}
+		info:      InitMinerInfo(id, minerConfigs[SmallMinerType].Energy),
+	}, nil
 }
 
 func (m *SmallMiner) GetInfo() MinerInfo {
@@ -93,11 +103,14 @@ func (m *SmallMiner) GetInfo() MinerInfo {
 	return m.info
 }
 
-func (m *SmallMiner) Run(ctx context.Context) <-chan Coal {
+func (m *SmallMiner) Run(ctx context.Context, wg *sync.WaitGroup) <-chan Coal {
 	ch := make(chan Coal)
 
 	go func() {
-		defer close(ch)
+		defer func() {
+			close(ch)
+			wg.Done()
+		}()
 
 		for i := 0; i < m.energy; i++ {
 			select {
@@ -119,6 +132,7 @@ func (m *SmallMiner) Run(ctx context.Context) <-chan Coal {
 //==================================================
 
 type NormalMiner struct {
+	ID        ID            // ID шахтёра
 	salary    Coal          // Оплата труда - 50
 	energy    int           // Энергия - 45
 	coalCount Coal          // За одну добычу - 3
@@ -127,14 +141,21 @@ type NormalMiner struct {
 	mtx       sync.Mutex    // Mutex для контроля гонки данных
 }
 
-func InitNormalMiner() *NormalMiner {
+func InitNormalMiner() (*NormalMiner, error) {
+	id, err := NewID()
+
+	if err != nil {
+		return &NormalMiner{}, err
+	}
+
 	return &NormalMiner{
+		ID:        id,
 		salary:    minerConfigs[NormalMinerType].Salary,
 		energy:    minerConfigs[NormalMinerType].Energy,
 		coalCount: minerConfigs[NormalMinerType].CoalCount,
 		timeout:   minerConfigs[NormalMinerType].Timeout,
-		info:      InitMinerInfo(minerConfigs[NormalMinerType].Energy),
-	}
+		info:      InitMinerInfo(id, minerConfigs[NormalMinerType].Energy),
+	}, nil
 }
 
 func (m *NormalMiner) GetInfo() MinerInfo {
@@ -144,11 +165,14 @@ func (m *NormalMiner) GetInfo() MinerInfo {
 	return m.info
 }
 
-func (m *NormalMiner) Run(ctx context.Context) <-chan Coal {
+func (m *NormalMiner) Run(ctx context.Context, wg *sync.WaitGroup) <-chan Coal {
 	ch := make(chan Coal)
 
 	go func() {
-		defer close(ch)
+		defer func() {
+			close(ch)
+			wg.Done()
+		}()
 
 		for i := 0; i < m.energy; i++ {
 			select {
@@ -170,6 +194,7 @@ func (m *NormalMiner) Run(ctx context.Context) <-chan Coal {
 //==================================================
 
 type StrongMiner struct {
+	ID        ID            // ID шахтёра
 	salary    Coal          // Оплата труда - 450
 	energy    int           // Энергия - 60
 	coalCount Coal          // За одну добычу - 10
@@ -179,15 +204,22 @@ type StrongMiner struct {
 	mtx       sync.Mutex    // Mutex для контроля гонки данных
 }
 
-func InitStrongMiner() *StrongMiner {
+func InitStrongMiner() (*StrongMiner, error) {
+	id, err := NewID()
+
+	if err != nil {
+		return &StrongMiner{}, err
+	}
+
 	return &StrongMiner{
+		ID:        id,
 		salary:    minerConfigs[StrongMinerType].Salary,
 		energy:    minerConfigs[StrongMinerType].Energy,
 		coalCount: minerConfigs[StrongMinerType].CoalCount,
 		timeout:   minerConfigs[StrongMinerType].Timeout,
-		info:      InitMinerInfo(minerConfigs[StrongMinerType].Energy),
+		info:      InitMinerInfo(id, minerConfigs[StrongMinerType].Energy),
 		progress:  minerConfigs[StrongMinerType].Progress,
-	}
+	}, nil
 }
 
 func (m *StrongMiner) GetInfo() MinerInfo {
@@ -197,11 +229,14 @@ func (m *StrongMiner) GetInfo() MinerInfo {
 	return m.info
 }
 
-func (m *StrongMiner) Run(ctx context.Context) <-chan Coal {
+func (m *StrongMiner) Run(ctx context.Context, wg *sync.WaitGroup) <-chan Coal {
 	ch := make(chan Coal)
 
 	go func() {
-		defer close(ch)
+		defer func() {
+			close(ch)
+			wg.Done()
+		}()
 
 		for i := 0; i < m.energy; i++ {
 			select {

@@ -27,8 +27,8 @@ type Enterprise struct {
 	Ctx       context.Context    // Контекст выполнения горутин
 	CtxCancel context.CancelFunc // Функция завершения контекста
 
-	ActiveMiners   map[int]Miner // Работающие в данный момент шахтёры
-	InactiveMiners map[int]Miner // Шахтёры завершившие работу
+	ActiveMiners   map[ID]Miner // Работающие в данный момент шахтёры
+	InactiveMiners map[ID]Miner // Шахтёры завершившие работу
 
 	AllEquipment map[EquipmentType]Equipment // Всё оборудование на предприятии
 
@@ -50,8 +50,8 @@ func InitEnterprise() *Enterprise {
 		Ctx:       tempCtx,
 		CtxCancel: tempCtxCancel,
 
-		ActiveMiners:   make(map[int]Miner),
-		InactiveMiners: make(map[int]Miner),
+		ActiveMiners:   make(map[ID]Miner),
+		InactiveMiners: make(map[ID]Miner),
 
 		AllEquipment: tempAllEquipment,
 	}
