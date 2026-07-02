@@ -59,3 +59,29 @@ func (g *GameService) HireMiner(minerType domain.MinerType) error {
 
 	return nil
 }
+
+/*
+GetActiveMiners() возвращает копию map всех работающих в данный момент шахтёров
+*/
+func (g *GameService) GetActiveMiners() map[domain.ID]domain.Miner {
+	result := make(map[domain.ID]domain.Miner, len(g.enterprise.ActiveMiners))
+
+	for key, value := range g.enterprise.ActiveMiners {
+		result[key] = value
+	}
+
+	return result
+}
+
+/*
+GetInactiveMiners() возвращает копию map шахтёров закончивших работу
+*/
+func (g *GameService) GetInactiveMiners() map[domain.ID]domain.Miner {
+	result := make(map[domain.ID]domain.Miner, len(g.enterprise.InactiveMiners))
+
+	for key, value := range g.enterprise.InactiveMiners {
+		result[key] = value
+	}
+
+	return result
+}
