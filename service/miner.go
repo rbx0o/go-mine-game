@@ -85,3 +85,35 @@ func (g *GameService) GetInactiveMiners() map[domain.ID]domain.Miner {
 
 	return result
 }
+
+/*
+GetActiveMinersFilter() возвращает копию map всех работающих в данный момент шахтёров,
+отфильтрованных по классу шахтёра
+*/
+func (g *GameService) GetActiveMinersFilter(minerType domain.MinerType) map[domain.ID]domain.Miner {
+	result := make(map[domain.ID]domain.Miner, len(g.enterprise.ActiveMiners))
+
+	for key, value := range g.enterprise.ActiveMiners {
+		if value.GetInfo().MinerType == minerType {
+			result[key] = value
+		}
+	}
+
+	return result
+}
+
+/*
+GetInactiveMinersFilter() возвращает копию map шахтёров закончивших работу,
+отфильтрованных по классу шахтёра
+*/
+func (g *GameService) GetInactiveMinersFilter(minerType domain.MinerType) map[domain.ID]domain.Miner {
+	result := make(map[domain.ID]domain.Miner, len(g.enterprise.InactiveMiners))
+
+	for key, value := range g.enterprise.InactiveMiners {
+		if value.GetInfo().MinerType == minerType {
+			result[key] = value
+		}
+	}
+
+	return result
+}

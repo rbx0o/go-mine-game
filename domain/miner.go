@@ -56,14 +56,16 @@ type Miner interface {
 //==================================================
 
 type MinerInfo struct {
-	ID         ID  // ID шахтёра
-	EnergyLeft int // Сколько энергии осталось
+	ID         ID        // ID шахтёра
+	EnergyLeft int       // Сколько энергии осталось
+	MinerType  MinerType // Тип шахтёра
 }
 
-func InitMinerInfo(id ID, energy int) MinerInfo {
+func InitMinerInfo(id ID, energy int, minerType MinerType) MinerInfo {
 	return MinerInfo{
 		ID:         id,
 		EnergyLeft: energy,
+		MinerType:  minerType,
 	}
 }
 
@@ -75,6 +77,7 @@ type SmallMiner struct {
 	energy    int           // Энергия - 30
 	coalCount Coal          // За одну добычу - 1
 	timeout   time.Duration // Задержка между добычами - 3
+	minerType MinerType     // Тип шахтёра
 	info      MinerInfo     // Информация о шахтёре в данный момент
 	mtx       sync.Mutex    // Mutex для контроля гонки данных
 }
@@ -92,7 +95,8 @@ func InitSmallMiner() (*SmallMiner, error) {
 		energy:    minerConfigs[SmallMinerType].Energy,
 		coalCount: minerConfigs[SmallMinerType].CoalCount,
 		timeout:   minerConfigs[SmallMinerType].Timeout,
-		info:      InitMinerInfo(id, minerConfigs[SmallMinerType].Energy),
+		minerType: SmallMinerType,
+		info:      InitMinerInfo(id, minerConfigs[SmallMinerType].Energy, SmallMinerType),
 	}, nil
 }
 
@@ -137,6 +141,7 @@ type NormalMiner struct {
 	energy    int           // Энергия - 45
 	coalCount Coal          // За одну добычу - 3
 	timeout   time.Duration // Задержка между добычами - 2
+	minerType MinerType     // Тип шахтёра
 	info      MinerInfo     // Информация о шахтёре в данный момент
 	mtx       sync.Mutex    // Mutex для контроля гонки данных
 }
@@ -154,7 +159,8 @@ func InitNormalMiner() (*NormalMiner, error) {
 		energy:    minerConfigs[NormalMinerType].Energy,
 		coalCount: minerConfigs[NormalMinerType].CoalCount,
 		timeout:   minerConfigs[NormalMinerType].Timeout,
-		info:      InitMinerInfo(id, minerConfigs[NormalMinerType].Energy),
+		minerType: NormalMinerType,
+		info:      InitMinerInfo(id, minerConfigs[NormalMinerType].Energy, NormalMinerType),
 	}, nil
 }
 
@@ -199,6 +205,7 @@ type StrongMiner struct {
 	energy    int           // Энергия - 60
 	coalCount Coal          // За одну добычу - 10
 	timeout   time.Duration // Задержка между добычами - 1
+	minerType MinerType     // Тип шахтёра
 	info      MinerInfo     // Информация о шахтёре в данный момент
 	progress  Coal          // coalCount увеличивается на progress - 3
 	mtx       sync.Mutex    // Mutex для контроля гонки данных
@@ -217,7 +224,8 @@ func InitStrongMiner() (*StrongMiner, error) {
 		energy:    minerConfigs[StrongMinerType].Energy,
 		coalCount: minerConfigs[StrongMinerType].CoalCount,
 		timeout:   minerConfigs[StrongMinerType].Timeout,
-		info:      InitMinerInfo(id, minerConfigs[StrongMinerType].Energy),
+		minerType: StrongMinerType,
+		info:      InitMinerInfo(id, minerConfigs[StrongMinerType].Energy, StrongMinerType),
 		progress:  minerConfigs[StrongMinerType].Progress,
 	}, nil
 }
