@@ -21,6 +21,8 @@ func (g *GameService) BuyEquipment(equipment domain.EquipmentType) error {
 		return EquipmentAlreadyBought
 	}
 	g.enterprise.AllEquipment[equipment].Buy()
+	g.enterprise.Balance -= g.enterprise.AllEquipment[equipment].Cost()
+
 	return nil
 }
 
