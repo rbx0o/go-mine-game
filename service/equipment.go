@@ -10,6 +10,10 @@ import "github.com/rbx0o/go-mine-game/domain"
 
 ==================================================*/
 
+/*
+BuyEquipment
+совершает покупку оборудования
+*/
 func (g *GameService) BuyEquipment(equipment domain.EquipmentType) error {
 	defer g.enterprise.Mtx.Unlock()
 	g.enterprise.Mtx.Lock()
@@ -20,6 +24,12 @@ func (g *GameService) BuyEquipment(equipment domain.EquipmentType) error {
 	if g.enterprise.AllEquipment[equipment].IsBought() {
 		return EquipmentAlreadyBought
 	}
+	if equipment != domain.PickaxeType &&
+		equipment != domain.VentilationType &&
+		equipment != domain.TrolleysType {
+		return EquipmentTypeNotFound
+	}
+
 	g.enterprise.AllEquipment[equipment].Buy()
 	g.enterprise.Balance -= g.enterprise.AllEquipment[equipment].Cost()
 
@@ -27,7 +37,8 @@ func (g *GameService) BuyEquipment(equipment domain.EquipmentType) error {
 }
 
 /*
-GetEquipmentTypesInfo возвращает информацию о всех типах доступного оборудования
+GetEquipmentTypesInfo
+возвращает информацию о всех типах доступного оборудования
 */
 func (g *GameService) GetEquipmentTypesInfo() map[domain.EquipmentType]domain.EquipmentInfo {
 	equipmentTypeMap := make(map[domain.EquipmentType]domain.EquipmentInfo, 3)
@@ -40,7 +51,8 @@ func (g *GameService) GetEquipmentTypesInfo() map[domain.EquipmentType]domain.Eq
 }
 
 /*
-GetEquipmentInfo возвращает информацию о том какое оборудование куплено/не куплено
+GetEquipmentInfo
+возвращает информацию о том какое оборудование куплено/не куплено
 */
 func (g *GameService) GetEquipmentInfo() map[domain.EquipmentType]bool {
 	result := make(map[domain.EquipmentType]bool, len(g.enterprise.AllEquipment))
