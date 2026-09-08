@@ -18,16 +18,16 @@ func (g *GameService) BuyEquipment(equipment domain.EquipmentType) error {
 	defer g.enterprise.Mtx.Unlock()
 	g.enterprise.Mtx.Lock()
 
+	if equipment != domain.PickaxeType &&
+		equipment != domain.VentilationType &&
+		equipment != domain.TrolleysType {
+		return EquipmentTypeNotFound
+	}
 	if (g.enterprise.Balance - g.enterprise.AllEquipment[equipment].Cost()) < 0 {
 		return NotEnoughCoal
 	}
 	if g.enterprise.AllEquipment[equipment].IsBought() {
 		return EquipmentAlreadyBought
-	}
-	if equipment != domain.PickaxeType &&
-		equipment != domain.VentilationType &&
-		equipment != domain.TrolleysType {
-		return EquipmentTypeNotFound
 	}
 
 	g.enterprise.AllEquipment[equipment].Buy()
