@@ -15,20 +15,21 @@ import (
 ==================================================*/
 
 /*
-StartPassiveIncome запускает пассивный заработок угля на
-предприятии в горутине
+StartPassiveIncome запускает пассивный заработок угля на предприятии в горутине
 */
 func (g *GameService) StartPassiveIncome(ctx context.Context) {
 
 	go func() {
-		select {
-		case <-ctx.Done():
-			return
+		for {
+			select {
+			case <-ctx.Done():
+				return
 
-		case <-time.After(1 * time.Second):
-			g.enterprise.Mtx.Lock()
-			g.enterprise.Balance += g.enterprise.PassiveIncome
-			g.enterprise.Mtx.Unlock()
+			case <-time.After(1 * time.Second):
+				g.enterprise.Mtx.Lock()
+				g.enterprise.Balance += g.enterprise.PassiveIncome
+				g.enterprise.Mtx.Unlock()
+			}
 		}
 	}()
 
