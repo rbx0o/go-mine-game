@@ -31,7 +31,7 @@ type Enterprise struct {
 
 	AllEquipment map[EquipmentType]Equipment // Всё оборудование на предприятии
 
-	Mtx sync.Mutex
+	Mtx sync.RWMutex
 }
 
 func InitEnterprise() *Enterprise {
