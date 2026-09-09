@@ -57,12 +57,16 @@ func (g *GameService) HireMiner(minerType domain.MinerType) error {
 	g.enterprise.ActiveMiners[miner.GetInfo().ID] = miner
 
 	go func() {
+		defer func() {
+			g.enterprise.Mtx.Unlock()
+		}()
+
 		for {
-			g.enterprise.Mtx.Lock()
 			tmpBalance, ok := <-chCoal
 			if !ok {
 				break
 			}
+			g.enterprise.Mtx.Lock()
 			g.enterprise.Balance += tmpBalance
 			g.enterprise.Mtx.Unlock()
 		}
