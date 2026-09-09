@@ -32,8 +32,6 @@ type Enterprise struct {
 }
 
 func InitEnterprise() *Enterprise {
-	//tempCtx, tempCtxCancel := context.WithCancel(context.Background())
-
 	tempAllEquipment := make(map[EquipmentType]Equipment, 3)
 	tempAllEquipment[PickaxeType] = InitPickaxe()
 	tempAllEquipment[VentilationType] = InitVentilation()

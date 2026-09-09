@@ -24,8 +24,8 @@ GetEnterpriseInfo
 возвращает структуру данных с информацией о предприятии в данный момент
 */
 func (g *GameService) GetEnterpriseInfo() EnterpriseInfo {
-	defer g.enterprise.Mtx.RLock()
-	g.enterprise.Mtx.RUnlock()
+	defer g.enterprise.Mtx.RUnlock()
+	g.enterprise.Mtx.RLock()
 
 	// ActiveMiners
 	activeMiners := make(map[domain.ID]domain.Miner, len(g.enterprise.ActiveMiners))
