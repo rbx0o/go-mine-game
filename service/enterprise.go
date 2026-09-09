@@ -24,12 +24,33 @@ GetEnterpriseInfo
 возвращает структуру данных с информацией о предприятии в данный момент
 */
 func (g *GameService) GetEnterpriseInfo() EnterpriseInfo {
+	defer g.enterprise.Mtx.RLock()
+	g.enterprise.Mtx.RUnlock()
+
+	// ActiveMiners
+	activeMiners := make(map[domain.ID]domain.Miner, len(g.enterprise.ActiveMiners))
+	for key, value := range g.enterprise.ActiveMiners {
+		activeMiners[key] = value
+	}
+
+	// InactiveMiners
+	inactiveMiners := make(map[domain.ID]domain.Miner, len(g.enterprise.InactiveMiners))
+	for key, value := range g.enterprise.InactiveMiners {
+		inactiveMiners[key] = value
+	}
+
+	// EquipmentInfo
+	equipmentInfo := make(map[domain.EquipmentType]bool, len(g.enterprise.AllEquipment))
+	for key := range g.enterprise.AllEquipment {
+		equipmentInfo[key] = g.enterprise.AllEquipment[key].IsBought()
+	}
+
 	return EnterpriseInfo{
 		Balance: g.enterprise.Balance,
 
-		ActiveMiners:   g.GetActiveMiners(),
-		InactiveMiners: g.GetInactiveMiners(),
+		ActiveMiners:   activeMiners,
+		InactiveMiners: inactiveMiners,
 
-		AllEquipment: g.GetEquipmentInfo(),
+		AllEquipment: equipmentInfo,
 	}
 }
