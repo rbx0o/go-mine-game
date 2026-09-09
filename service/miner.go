@@ -56,7 +56,7 @@ func (g *GameService) HireMiner(minerType domain.MinerType) error {
 	}
 
 	wg.Add(1)
-	chCoal = miner.Run(g.enterprise.Ctx, wg)
+	chCoal = miner.Run(g.ctx, wg)
 	g.enterprise.ActiveMiners[miner.GetInfo().ID] = miner
 
 	go func() {

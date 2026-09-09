@@ -44,7 +44,6 @@ func (g *GameService) Start() error {
 
 func (g *GameService) Stop() error {
 
-	g.enterprise.CtxCancel()
 	g.ctxCancel()
 
 	return nil

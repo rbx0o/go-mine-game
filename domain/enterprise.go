@@ -3,7 +3,6 @@ package domain
 // Файл в котором будет описано предприятие и базовая логика
 
 import (
-	"context"
 	"sync"
 )
 
@@ -24,8 +23,8 @@ type Enterprise struct {
 	Balance       Coal // Баланс угля
 	PassiveIncome Coal // Пассивный доход угля в секунду
 
-	Ctx       context.Context    // Контекст выполнения горутин
-	CtxCancel context.CancelFunc // Функция завершения контекста
+	//Ctx       context.Context    // Контекст выполнения горутин
+	//CtxCancel context.CancelFunc // Функция завершения контекста
 
 	ActiveMiners   map[ID]Miner // Работающие в данный момент шахтёры
 	InactiveMiners map[ID]Miner // Шахтёры завершившие работу
@@ -36,7 +35,7 @@ type Enterprise struct {
 }
 
 func InitEnterprise() *Enterprise {
-	tempCtx, tempCtxCancel := context.WithCancel(context.Background())
+	//tempCtx, tempCtxCancel := context.WithCancel(context.Background())
 
 	tempAllEquipment := make(map[EquipmentType]Equipment, 3)
 	tempAllEquipment[PickaxeType] = InitPickaxe()
@@ -47,8 +46,8 @@ func InitEnterprise() *Enterprise {
 		Balance:       0,
 		PassiveIncome: 1,
 
-		Ctx:       tempCtx,
-		CtxCancel: tempCtxCancel,
+		//Ctx:       tempCtx,
+		//CtxCancel: tempCtxCancel,
 
 		ActiveMiners:   make(map[ID]Miner),
 		InactiveMiners: make(map[ID]Miner),

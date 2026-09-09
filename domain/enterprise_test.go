@@ -22,14 +22,6 @@ func Test_InitEnterpriseReturnCorrectValues(t *testing.T) {
 		t.Errorf("want passive income: %v, has passive income: %v", wantPassiveIncome, hasPassiveIncome)
 	}
 
-	if ent.Ctx == nil {
-		t.Errorf("ctx is nil")
-	}
-
-	if ent.CtxCancel == nil {
-		t.Errorf("ctx cancel func is nil")
-	}
-
 	if ent.ActiveMiners == nil {
 		t.Errorf("active miners map is nil")
 	}
