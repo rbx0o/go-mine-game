@@ -46,10 +46,13 @@ func (g *GameService) HireMiner(minerType domain.MinerType) error {
 		return err
 	}
 
+	g.enterprise.Mtx.Lock()
 	if g.enterprise.Balance < domain.GetMinerConfigs()[minerType].Salary {
+		g.enterprise.Mtx.Unlock()
 		return NotEnoughCoal
 	} else {
 		g.enterprise.Balance -= domain.GetMinerConfigs()[minerType].Salary
+		g.enterprise.Mtx.Unlock()
 	}
 
 	wg.Add(1)
