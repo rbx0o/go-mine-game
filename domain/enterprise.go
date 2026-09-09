@@ -23,9 +23,6 @@ type Enterprise struct {
 	Balance       Coal // Баланс угля
 	PassiveIncome Coal // Пассивный доход угля в секунду
 
-	//Ctx       context.Context    // Контекст выполнения горутин
-	//CtxCancel context.CancelFunc // Функция завершения контекста
-
 	ActiveMiners   map[ID]Miner // Работающие в данный момент шахтёры
 	InactiveMiners map[ID]Miner // Шахтёры завершившие работу
 
@@ -45,9 +42,6 @@ func InitEnterprise() *Enterprise {
 	return &Enterprise{
 		Balance:       0,
 		PassiveIncome: 1,
-
-		//Ctx:       tempCtx,
-		//CtxCancel: tempCtxCancel,
 
 		ActiveMiners:   make(map[ID]Miner),
 		InactiveMiners: make(map[ID]Miner),
