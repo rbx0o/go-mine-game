@@ -46,12 +46,27 @@ func (g *GameService) HireMiner(minerType domain.MinerType) error {
 		return err
 	}
 
+	if g.enterprise.Balance < domain.GetMinerConfigs()[minerType].Salary {
+		return NotEnoughCoal
+	} else {
+		g.enterprise.Balance -= domain.GetMinerConfigs()[minerType].Salary
+	}
+
 	wg.Add(1)
 	chCoal = miner.Run(g.enterprise.Ctx, wg)
 	g.enterprise.ActiveMiners[miner.GetInfo().ID] = miner
 
 	go func() {
-		g.enterprise.Balance += <-chCoal
+		for {
+			g.enterprise.Mtx.Lock()
+			tmpBalance, ok := <-chCoal
+			if !ok {
+				break
+			}
+			g.enterprise.Balance += tmpBalance
+			g.enterprise.Mtx.Unlock()
+		}
+
 		wg.Wait()
 		g.enterprise.InactiveMiners[miner.GetInfo().ID] = miner
 		delete(g.enterprise.ActiveMiners, miner.GetInfo().ID)
