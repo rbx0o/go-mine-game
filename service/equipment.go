@@ -1,6 +1,8 @@
 package service
 
-import "github.com/rbx0o/go-mine-game/domain"
+import (
+	"github.com/rbx0o/go-mine-game/domain"
+)
 
 /*==================================================
 
@@ -32,6 +34,11 @@ func (g *GameService) BuyEquipment(equipment domain.EquipmentType) error {
 
 	g.enterprise.AllEquipment[equipment].Buy()
 	g.enterprise.Balance -= g.enterprise.AllEquipment[equipment].Cost()
+
+	if g.CheckAllEquipmentIsBought() {
+		g.gameResult.endedAuto = true
+		g.StopGame()
+	}
 
 	return nil
 }
@@ -65,4 +72,18 @@ func (g *GameService) GetEquipmentInfo() map[domain.EquipmentType]bool {
 	}
 
 	return result
+}
+
+/*
+CheckAllEquipmentIsBought
+проверяет куплено ли всё оборудование
+*/
+func (g *GameService) CheckAllEquipmentIsBought() bool {
+	if g.enterprise.AllEquipment[domain.PickaxeType].IsBought() &&
+		g.enterprise.AllEquipment[domain.VentilationType].IsBought() &&
+		g.enterprise.AllEquipment[domain.TrolleysType].IsBought() {
+		return true
+	} else {
+		return false
+	}
 }
