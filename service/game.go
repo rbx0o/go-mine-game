@@ -23,28 +23,37 @@ type GameService struct {
 
 	ctx       context.Context
 	ctxCancel context.CancelFunc
+
+	minerCtx       context.Context
+	minerCtxCancel context.CancelFunc
 }
 
 func InitGameService() *GameService {
 	tempCtx, tempCtxCancel := context.WithCancel(context.Background())
+	tempMinerCtx, tempMinerCtxCancel := context.WithCancel(tempCtx)
 
 	return &GameService{
 		enterprise: domain.InitEnterprise(),
 
 		ctx:       tempCtx,
 		ctxCancel: tempCtxCancel,
+
+		minerCtx:       tempMinerCtx,
+		minerCtxCancel: tempMinerCtxCancel,
 	}
 }
 
 func (g *GameService) Start() error {
 	g.StartPassiveIncome(g.ctx)
-
 	return nil
 }
 
-func (g *GameService) Stop() error {
-
+func (g *GameService) StopGame() error {
 	g.ctxCancel()
+	return nil
+}
 
+func (g *GameService) StopMiners() error {
+	g.minerCtxCancel()
 	return nil
 }
