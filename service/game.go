@@ -78,8 +78,18 @@ func (g *GameService) StopGame() (error, *GameResult) {
 		g.gameResult.balance = g.enterprise.Balance
 		g.gameResult.endTime = time.Now()
 		g.gameResult.durationTime = time.Since(g.gameResult.startTime)
-		g.gameResult.resultEquipment = g.GetEquipmentInfo()
-		g.gameResult.resultMiners = g.GetInactiveMiners()
+
+		resultEquipment := make(map[domain.EquipmentType]bool, len(g.enterprise.AllEquipment))
+		for key := range g.enterprise.AllEquipment {
+			resultEquipment[key] = g.enterprise.AllEquipment[key].IsBought()
+		}
+		g.gameResult.resultEquipment = resultEquipment
+
+		resultMiners := make(map[domain.ID]domain.Miner, len(g.enterprise.InactiveMiners))
+		for key, value := range g.enterprise.InactiveMiners {
+			resultMiners[key] = value
+		}
+		g.gameResult.resultMiners = resultMiners
 
 		return nil, g.gameResult
 	}
