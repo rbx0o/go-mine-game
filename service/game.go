@@ -74,9 +74,17 @@ func (g *GameService) Start() error {
 
 /*
 StopGame
-останавливает игру целиком
+ручное отправление запроса о завершении игры
 */
 func (g *GameService) StopGame() (error, *GameResult) {
+	return g.finishGame(false)
+}
+
+/*
+finishGame
+завершает игру
+*/
+func (g *GameService) finishGame(endedAuto bool) (error, *GameResult) {
 	g.mtx.Lock()
 	defer g.mtx.Unlock()
 
@@ -104,6 +112,8 @@ func (g *GameService) StopGame() (error, *GameResult) {
 			resultMiners[key] = value
 		}
 		g.gameResult.ResultMiners = resultMiners
+
+		g.gameResult.EndedAuto = endedAuto
 
 		return nil, g.gameResult
 	}

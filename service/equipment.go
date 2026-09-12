@@ -42,11 +42,7 @@ func (g *GameService) BuyEquipment(equipment domain.EquipmentType) error {
 	g.enterprise.Mtx.Unlock()
 
 	if check {
-		g.mtx.Lock()
-		g.gameResult.EndedAuto = true
-		g.mtx.Unlock()
-
-		g.StopGame()
+		g.finishGame(true)
 	}
 
 	return nil
