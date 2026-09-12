@@ -34,9 +34,11 @@ func (g *GameService) BuyEquipment(equipment domain.EquipmentType) error {
 	g.enterprise.AllEquipment[equipment].Buy()
 	g.enterprise.Balance -= g.enterprise.AllEquipment[equipment].Cost()
 
+	check := g.CheckAllEquipmentIsBought()
+
 	g.enterprise.Mtx.Unlock()
 
-	if g.CheckAllEquipmentIsBought() {
+	if check {
 		g.gameResult.EndedAuto = true
 		g.StopGame()
 	}

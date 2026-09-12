@@ -24,7 +24,6 @@ func (g *GameService) StartPassiveIncome(ctx context.Context) {
 			for {
 				select {
 				case <-ctx.Done():
-					g.wg.Done()
 					return
 
 				case <-time.After(1 * time.Second):

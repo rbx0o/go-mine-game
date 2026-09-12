@@ -78,6 +78,7 @@ func (g *GameService) StopGame() (error, *GameResult) {
 	if err := g.ctx.Err(); err != nil {
 		return GameServiceCtxAlreadyCanceled, nil
 	} else {
+		defer g.enterprise.Mtx.Unlock()
 		g.ctxCancel()
 
 		g.wg.Wait()
@@ -98,8 +99,6 @@ func (g *GameService) StopGame() (error, *GameResult) {
 			resultMiners[key] = value
 		}
 		g.gameResult.ResultMiners = resultMiners
-
-		g.enterprise.Mtx.Unlock()
 
 		return nil, g.gameResult
 	}

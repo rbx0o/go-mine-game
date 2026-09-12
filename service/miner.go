@@ -79,9 +79,9 @@ func (g *GameService) HireMiner(minerType domain.MinerType) error {
 		g.enterprise.InactiveMiners[miner.GetInfo().ID] = miner
 		delete(g.enterprise.ActiveMiners, miner.GetInfo().ID)
 		g.enterprise.Mtx.Unlock()
+		g.wg.Done()
 	}()
 
-	g.wg.Done()
 	return nil
 }
 
