@@ -42,7 +42,10 @@ func (g *GameService) BuyEquipment(equipment domain.EquipmentType) error {
 	g.enterprise.Mtx.Unlock()
 
 	if check {
+		g.mtx.Lock()
 		g.gameResult.EndedAuto = true
+		g.mtx.Unlock()
+
 		g.StopGame()
 	}
 
@@ -68,8 +71,8 @@ GetEquipmentInfo
 возвращает информацию о том какое оборудование куплено/не куплено
 */
 func (g *GameService) GetEquipmentInfo() map[domain.EquipmentType]bool {
-	defer g.enterprise.Mtx.RUnlock()
 	g.enterprise.Mtx.RLock()
+	defer g.enterprise.Mtx.RUnlock()
 
 	result := make(map[domain.EquipmentType]bool, len(g.enterprise.AllEquipment))
 

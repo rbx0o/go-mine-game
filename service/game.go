@@ -77,8 +77,8 @@ StopGame
 останавливает игру целиком
 */
 func (g *GameService) StopGame() (error, *GameResult) {
-	defer g.mtx.Unlock()
 	g.mtx.Lock()
+	defer g.mtx.Unlock()
 
 	if err := g.ctx.Err(); err != nil {
 		return GameServiceCtxAlreadyCanceled, nil
@@ -114,8 +114,8 @@ StopMiners
 останавливает только работу шахтёров
 */
 func (g *GameService) StopMiners() error {
-	defer g.mtx.Unlock()
 	g.mtx.Lock()
+	defer g.mtx.Unlock()
 
 	if err := g.minerCtx.Err(); err != nil {
 		return MinersCtxAlreadyCanceled
@@ -130,8 +130,8 @@ GetGameResult
 возвращает результат игры
 */
 func (g *GameService) GetGameResult() (error, *GameResult) {
-	defer g.mtx.Unlock()
 	g.mtx.Lock()
+	defer g.mtx.Unlock()
 
 	if err := g.ctx.Err(); err == nil {
 		return GameNotEnd, nil
