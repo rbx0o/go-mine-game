@@ -34,7 +34,8 @@ type GameService struct {
 
 	gameResult *GameResult
 
-	wg *sync.WaitGroup
+	wg  *sync.WaitGroup
+	mtx sync.Mutex
 }
 
 /*
@@ -56,7 +57,8 @@ func InitGameService() *GameService {
 
 		gameResult: InitGameResult(),
 
-		wg: &sync.WaitGroup{},
+		wg:  &sync.WaitGroup{},
+		mtx: sync.Mutex{},
 	}
 }
 
@@ -75,14 +77,17 @@ StopGame
 останавливает игру целиком
 */
 func (g *GameService) StopGame() (error, *GameResult) {
+	defer g.mtx.Unlock()
+	g.mtx.Lock()
+
 	if err := g.ctx.Err(); err != nil {
 		return GameServiceCtxAlreadyCanceled, nil
 	} else {
-		defer g.enterprise.Mtx.Unlock()
 		g.ctxCancel()
 
 		g.wg.Wait()
 		g.enterprise.Mtx.Lock()
+		defer g.enterprise.Mtx.Unlock()
 
 		g.gameResult.Balance = g.enterprise.Balance
 		g.gameResult.EndTime = time.Now()
@@ -109,6 +114,9 @@ StopMiners
 останавливает только работу шахтёров
 */
 func (g *GameService) StopMiners() error {
+	defer g.mtx.Unlock()
+	g.mtx.Lock()
+
 	if err := g.minerCtx.Err(); err != nil {
 		return MinersCtxAlreadyCanceled
 	} else {
@@ -122,6 +130,9 @@ GetGameResult
 возвращает результат игры
 */
 func (g *GameService) GetGameResult() (error, *GameResult) {
+	defer g.mtx.Unlock()
+	g.mtx.Lock()
+
 	if err := g.ctx.Err(); err == nil {
 		return GameNotEnd, nil
 	} else {

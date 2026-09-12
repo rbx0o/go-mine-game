@@ -26,7 +26,6 @@ func (g *GameService) GetMinerTypesInfo() map[domain.MinerType]domain.MinerConfi
 HireMiner() нанимает шахтёра на работу
 */
 func (g *GameService) HireMiner(minerType domain.MinerType) error {
-	g.wg.Add(1)
 	var miner domain.Miner
 	var chCoal <-chan domain.Coal
 	var wg = &sync.WaitGroup{}
@@ -57,6 +56,7 @@ func (g *GameService) HireMiner(minerType domain.MinerType) error {
 	}
 
 	wg.Add(1)
+	g.wg.Add(1)
 	chCoal = miner.Run(g.minerCtx, wg)
 
 	g.enterprise.Mtx.Lock()
