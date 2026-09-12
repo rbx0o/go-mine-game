@@ -19,18 +19,19 @@ StartPassiveIncome запускает пассивный заработок уг
 */
 func (g *GameService) StartPassiveIncome(ctx context.Context) {
 
-	go func() {
-		for {
-			select {
-			case <-ctx.Done():
-				return
+	g.wg.Go(
+		func() {
+			for {
+				select {
+				case <-ctx.Done():
+					g.wg.Done()
+					return
 
-			case <-time.After(1 * time.Second):
-				g.enterprise.Mtx.Lock()
-				g.enterprise.Balance += g.enterprise.PassiveIncome
-				g.enterprise.Mtx.Unlock()
+				case <-time.After(1 * time.Second):
+					g.enterprise.Mtx.Lock()
+					g.enterprise.Balance += g.enterprise.PassiveIncome
+					g.enterprise.Mtx.Unlock()
+				}
 			}
-		}
-	}()
-
+		})
 }

@@ -17,7 +17,6 @@ BuyEquipment
 совершает покупку оборудования
 */
 func (g *GameService) BuyEquipment(equipment domain.EquipmentType) error {
-	defer g.enterprise.Mtx.Unlock()
 	g.enterprise.Mtx.Lock()
 
 	if equipment != domain.PickaxeType &&
@@ -35,8 +34,10 @@ func (g *GameService) BuyEquipment(equipment domain.EquipmentType) error {
 	g.enterprise.AllEquipment[equipment].Buy()
 	g.enterprise.Balance -= g.enterprise.AllEquipment[equipment].Cost()
 
+	g.enterprise.Mtx.Unlock()
+
 	if g.CheckAllEquipmentIsBought() {
-		g.gameResult.endedAuto = true
+		g.gameResult.EndedAuto = true
 		g.StopGame()
 	}
 

@@ -4,6 +4,7 @@ package service
 
 import (
 	"context"
+	"sync"
 	"time"
 
 	"github.com/rbx0o/go-mine-game/domain"
@@ -32,6 +33,8 @@ type GameService struct {
 	minerCtxCancel context.CancelFunc
 
 	gameResult *GameResult
+
+	wg *sync.WaitGroup
 }
 
 /*
@@ -52,6 +55,8 @@ func InitGameService() *GameService {
 		minerCtxCancel: tempMinerCtxCancel,
 
 		gameResult: InitGameResult(),
+
+		wg: &sync.WaitGroup{},
 	}
 }
 
@@ -60,7 +65,7 @@ Start
 запускает игру
 */
 func (g *GameService) Start() error {
-	g.gameResult.startTime = time.Now()
+	g.gameResult.StartTime = time.Now()
 	g.StartPassiveIncome(g.ctx)
 	return nil
 }
@@ -75,21 +80,26 @@ func (g *GameService) StopGame() (error, *GameResult) {
 	} else {
 		g.ctxCancel()
 
-		g.gameResult.balance = g.enterprise.Balance
-		g.gameResult.endTime = time.Now()
-		g.gameResult.durationTime = time.Since(g.gameResult.startTime)
+		g.wg.Wait()
+		g.enterprise.Mtx.Lock()
+
+		g.gameResult.Balance = g.enterprise.Balance
+		g.gameResult.EndTime = time.Now()
+		g.gameResult.DurationTime = time.Since(g.gameResult.StartTime)
 
 		resultEquipment := make(map[domain.EquipmentType]bool, len(g.enterprise.AllEquipment))
 		for key := range g.enterprise.AllEquipment {
 			resultEquipment[key] = g.enterprise.AllEquipment[key].IsBought()
 		}
-		g.gameResult.resultEquipment = resultEquipment
+		g.gameResult.ResultEquipment = resultEquipment
 
 		resultMiners := make(map[domain.ID]domain.Miner, len(g.enterprise.InactiveMiners))
 		for key, value := range g.enterprise.InactiveMiners {
 			resultMiners[key] = value
 		}
-		g.gameResult.resultMiners = resultMiners
+		g.gameResult.ResultMiners = resultMiners
+
+		g.enterprise.Mtx.Unlock()
 
 		return nil, g.gameResult
 	}
@@ -123,13 +133,13 @@ func (g *GameService) GetGameResult() (error, *GameResult) {
 //==================================================
 
 type GameResult struct {
-	balance         domain.Coal
-	startTime       time.Time
-	endTime         time.Time
-	durationTime    time.Duration
-	endedAuto       bool
-	resultEquipment map[domain.EquipmentType]bool
-	resultMiners    map[domain.ID]domain.Miner
+	Balance         domain.Coal
+	StartTime       time.Time
+	EndTime         time.Time
+	DurationTime    time.Duration
+	EndedAuto       bool
+	ResultEquipment map[domain.EquipmentType]bool
+	ResultMiners    map[domain.ID]domain.Miner
 }
 
 func InitGameResult() *GameResult {
