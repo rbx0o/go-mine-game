@@ -6,7 +6,7 @@ type HTTPHandlers struct {
 	gameService *service.GameService
 }
 
-func (h *HTTPHandlers) NewHTTPHandlers(gameService *service.GameService) *HTTPHandlers {
+func NewHTTPHandlers(gameService *service.GameService) *HTTPHandlers {
 	return &HTTPHandlers{
 		gameService: gameService,
 	}
