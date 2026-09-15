@@ -80,6 +80,8 @@ Start
 */
 func (g *GameService) Start() error {
 	g.mtx.Lock()
+	defer g.mtx.Unlock()
+
 	switch g.state {
 	case Running:
 		return GameAlreadyRunning
@@ -89,7 +91,6 @@ func (g *GameService) Start() error {
 		g.state = Running
 		g.gameResult.StartTime = time.Now()
 	}
-	g.mtx.Unlock()
 
 	g.StartPassiveIncome(g.ctx)
 	return nil
@@ -111,6 +112,15 @@ func (g *GameService) finishGame(endedAuto bool) (error, *GameResult) {
 	g.mtx.Lock()
 	defer g.mtx.Unlock()
 
+	switch g.state {
+	case Running:
+		g.state = Finished
+	case Finished:
+		return GameAlreadyFinished, nil
+	case Created:
+		return GameNotRunningYet, nil
+	}
+
 	if err := g.ctx.Err(); err != nil {
 		return GameServiceCtxAlreadyCanceled, nil
 	} else {
@@ -119,15 +129,6 @@ func (g *GameService) finishGame(endedAuto bool) (error, *GameResult) {
 		g.wg.Wait()
 		g.enterprise.Mtx.Lock()
 		defer g.enterprise.Mtx.Unlock()
-
-		switch g.state {
-		case Running:
-			g.state = Finished
-		case Finished:
-			return GameAlreadyFinished, nil
-		case Created:
-			return GameNotRunningYet, nil
-		}
 
 		g.gameResult.Balance = g.enterprise.Balance
 		g.gameResult.EndTime = time.Now()
