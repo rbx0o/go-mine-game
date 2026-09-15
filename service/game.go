@@ -23,6 +23,16 @@ import (
 
 ==================================================*/
 
+type GameState string
+
+const (
+	Created  GameState = "game_created"
+	Running  GameState = "game_running"
+	Finished GameState = "game_finished"
+)
+
+//==================================================
+
 type GameService struct {
 	enterprise *domain.Enterprise
 
@@ -34,8 +44,9 @@ type GameService struct {
 
 	gameResult *GameResult
 
-	wg  *sync.WaitGroup
-	mtx sync.Mutex
+	wg    *sync.WaitGroup
+	mtx   sync.Mutex
+	state GameState
 }
 
 /*
@@ -57,8 +68,9 @@ func InitGameService() *GameService {
 
 		gameResult: InitGameResult(),
 
-		wg:  &sync.WaitGroup{},
-		mtx: sync.Mutex{},
+		wg:    &sync.WaitGroup{},
+		mtx:   sync.Mutex{},
+		state: Created,
 	}
 }
 
@@ -67,7 +79,18 @@ Start
 запускает игру
 */
 func (g *GameService) Start() error {
-	g.gameResult.StartTime = time.Now()
+	g.mtx.Lock()
+	switch g.state {
+	case Running:
+		return GameAlreadyRunning
+	case Finished:
+		return GameAlreadyFinished
+	case Created:
+		g.state = Running
+		g.gameResult.StartTime = time.Now()
+	}
+	g.mtx.Unlock()
+
 	g.StartPassiveIncome(g.ctx)
 	return nil
 }
@@ -96,6 +119,15 @@ func (g *GameService) finishGame(endedAuto bool) (error, *GameResult) {
 		g.wg.Wait()
 		g.enterprise.Mtx.Lock()
 		defer g.enterprise.Mtx.Unlock()
+
+		switch g.state {
+		case Running:
+			g.state = Finished
+		case Finished:
+			return GameAlreadyFinished, nil
+		case Created:
+			return GameNotRunningYet, nil
+		}
 
 		g.gameResult.Balance = g.enterprise.Balance
 		g.gameResult.EndTime = time.Now()
