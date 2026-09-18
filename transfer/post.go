@@ -16,26 +16,38 @@ info:		-
 
 succeed:
   - status code:	201 Created
-  - response body:	Server started successfully
+  - response body:	Game started successfully + time
 
 failed:
-  - status code:	400 BadRequest, 409 Conflict, 500 InternalServerError
+  - status code:	409 Conflict, 500 InternalServerError
   - response body: 	JSON with error + time
 */
 func (h *HTTPHandlers) StartGame(response http.ResponseWriter, request *http.Request) {
 	err := h.gameService.Start()
-	response.Header().Set("Content-Type", "application/json")
 
 	switch err {
 	case service.GameAlreadyFinished:
 	case service.GameAlreadyRunning:
-		ErrorToJson(err, time.Now(), response, http.StatusConflict)
+		dto := ErrorResponseDTO{
+			Error: err.Error(),
+			Time:  time.Now(),
+		}
+		SendJSON(response, dto, http.StatusConflict)
 		return
 	case nil:
-		response.WriteHeader(http.StatusCreated)
+		dto := SuccessResponseDTO[struct{}]{
+			Data:    nil,
+			Message: "Game started successfully",
+			Time:    time.Now(),
+		}
+		SendJSON(response, dto, http.StatusCreated)
 		return
 	default:
-		ErrorToJson(err, time.Now(), response, http.StatusInternalServerError)
+		dto := ErrorResponseDTO{
+			Error: "",
+			Time:  time.Now(),
+		}
+		SendJSON(response, dto, http.StatusInternalServerError)
+		return
 	}
-
 }
