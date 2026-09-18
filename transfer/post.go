@@ -15,7 +15,7 @@ method:		POST
 info:		-
 
 succeed:
-  - status code:	201 Created
+  - status code:	200 OK
   - response body:	Game started successfully + time
 
 failed:
@@ -26,8 +26,7 @@ func (h *HTTPHandlers) StartGame(response http.ResponseWriter, request *http.Req
 	err := h.gameService.Start()
 
 	switch err {
-	case service.GameAlreadyFinished:
-	case service.GameAlreadyRunning:
+	case service.GameAlreadyFinished, service.GameAlreadyRunning:
 		dto := ErrorResponseDTO{
 			Error: err.Error(),
 			Time:  time.Now(),
@@ -40,7 +39,7 @@ func (h *HTTPHandlers) StartGame(response http.ResponseWriter, request *http.Req
 			Message: "Game started successfully",
 			Time:    time.Now(),
 		}
-		SendJSON(response, dto, http.StatusCreated)
+		SendJSON(response, dto, http.StatusOK)
 		return
 	default:
 		dto := ErrorResponseDTO{
