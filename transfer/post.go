@@ -43,7 +43,7 @@ func (h *HTTPHandlers) StartGame(response http.ResponseWriter, request *http.Req
 		return
 	default:
 		dto := ErrorResponseDTO{
-			Error: "",
+			Error: err.Error(),
 			Time:  time.Now(),
 		}
 		SendJSON(response, dto, http.StatusInternalServerError)
