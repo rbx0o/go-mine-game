@@ -34,7 +34,8 @@ func main() {
 
 	fmt.Printf("Start HTTP server on %v:%v\n", hostname, port)
 	if err := server.StartServer(hostname, port); err != nil {
-		fmt.Printf("HTTP server error %v\n", err)
+		str := fmt.Sprintf("HTTP server error %v\n", err)
+		panic(str)
 	}
 	fmt.Println("Game Over")
 }
