@@ -42,8 +42,7 @@ type GameService struct {
 	minerCtx       context.Context
 	minerCtxCancel context.CancelFunc
 
-	gameResult       *GameResult
-	intermediateInfo *IntermediateInfo
+	gameResult *GameResult
 
 	wg    *sync.WaitGroup
 	mtx   sync.Mutex
@@ -67,8 +66,7 @@ func InitGameService() *GameService {
 		minerCtx:       tempMinerCtx,
 		minerCtxCancel: tempMinerCtxCancel,
 
-		gameResult:       InitGameResult(),
-		intermediateInfo: &IntermediateInfo{},
+		gameResult: InitGameResult(),
 
 		wg:    &sync.WaitGroup{},
 		mtx:   sync.Mutex{},
@@ -235,26 +233,28 @@ func (g *GameService) GetIntermediateInfo() (error, *IntermediateInfo) {
 		g.enterprise.Mtx.RLock()
 		defer g.enterprise.Mtx.RUnlock()
 
-		g.intermediateInfo.Balance = g.enterprise.Balance
+		info := &IntermediateInfo{}
+
+		info.Balance = g.enterprise.Balance
 
 		activeMiners := make(map[domain.ID]domain.Miner, len(g.enterprise.ActiveMiners))
 		for key, value := range g.enterprise.ActiveMiners {
 			activeMiners[key] = value
 		}
-		g.intermediateInfo.ActiveMiners = activeMiners
+		info.ActiveMiners = activeMiners
 
 		inactiveMiners := make(map[domain.ID]domain.Miner, len(g.enterprise.InactiveMiners))
 		for key, value := range g.enterprise.InactiveMiners {
 			inactiveMiners[key] = value
 		}
-		g.intermediateInfo.InactiveMiners = inactiveMiners
+		info.InactiveMiners = inactiveMiners
 
 		equipment := make(map[domain.EquipmentType]bool, len(g.enterprise.AllEquipment))
 		for key := range g.enterprise.AllEquipment {
 			equipment[key] = g.enterprise.AllEquipment[key].IsBought()
 		}
-		g.intermediateInfo.EquipmentInfo = equipment
+		info.EquipmentInfo = equipment
 
-		return nil, g.intermediateInfo
+		return nil, info
 	}
 }
