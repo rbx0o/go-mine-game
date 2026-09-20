@@ -42,7 +42,8 @@ type GameService struct {
 	minerCtx       context.Context
 	minerCtxCancel context.CancelFunc
 
-	gameResult *GameResult
+	gameResult       *GameResult
+	intermediateInfo *IntermediateInfo
 
 	wg    *sync.WaitGroup
 	mtx   sync.Mutex
@@ -66,7 +67,8 @@ func InitGameService() *GameService {
 		minerCtx:       tempMinerCtx,
 		minerCtxCancel: tempMinerCtxCancel,
 
-		gameResult: InitGameResult(),
+		gameResult:       InitGameResult(),
+		intermediateInfo: &IntermediateInfo{},
 
 		wg:    &sync.WaitGroup{},
 		mtx:   sync.Mutex{},
@@ -169,21 +171,6 @@ func (g *GameService) StopMiners() error {
 }
 
 /*
-GetGameResult
-возвращает результат игры
-*/
-func (g *GameService) GetGameResult() (error, *GameResult) {
-	g.mtx.Lock()
-	defer g.mtx.Unlock()
-
-	if err := g.ctx.Err(); err == nil {
-		return GameNotEnd, nil
-	} else {
-		return nil, g.gameResult
-	}
-}
-
-/*
 GetState возвращает состояние игры
 */
 func (g *GameService) GetState() GameState {
@@ -206,4 +193,68 @@ type GameResult struct {
 
 func InitGameResult() *GameResult {
 	return &GameResult{}
+}
+
+/*
+GetGameResult возвращает результат игры
+*/
+func (g *GameService) GetGameResult() (error, *GameResult) {
+	g.mtx.Lock()
+	defer g.mtx.Unlock()
+
+	if err := g.ctx.Err(); err == nil {
+		return GameNotEnd, nil
+	} else {
+		return nil, g.gameResult
+	}
+}
+
+//==================================================
+
+type IntermediateInfo struct {
+	Balance        domain.Coal
+	ActiveMiners   map[domain.ID]domain.Miner
+	InactiveMiners map[domain.ID]domain.Miner
+	EquipmentInfo  map[domain.EquipmentType]bool
+}
+
+func (g *GameService) GetIntermediateInfo() (error, *IntermediateInfo) {
+	g.mtx.Lock()
+	defer g.mtx.Unlock()
+
+	switch g.state {
+	case Created:
+		return GameNotRunningYet, nil
+	case Finished:
+		return GameAlreadyFinished, nil
+	}
+
+	if err := g.ctx.Err(); err != nil {
+		return GameServiceCtxAlreadyCanceled, nil
+	} else {
+		g.enterprise.Mtx.RLock()
+		defer g.enterprise.Mtx.RUnlock()
+
+		g.intermediateInfo.Balance = g.enterprise.Balance
+
+		activeMiners := make(map[domain.ID]domain.Miner, len(g.enterprise.ActiveMiners))
+		for key, value := range g.enterprise.ActiveMiners {
+			activeMiners[key] = value
+		}
+		g.intermediateInfo.ActiveMiners = activeMiners
+
+		inactiveMiners := make(map[domain.ID]domain.Miner, len(g.enterprise.InactiveMiners))
+		for key, value := range g.enterprise.InactiveMiners {
+			inactiveMiners[key] = value
+		}
+		g.intermediateInfo.InactiveMiners = inactiveMiners
+
+		equipment := make(map[domain.EquipmentType]bool, len(g.enterprise.AllEquipment))
+		for key := range g.enterprise.AllEquipment {
+			equipment[key] = g.enterprise.AllEquipment[key].IsBought()
+		}
+		g.intermediateInfo.EquipmentInfo = equipment
+
+		return nil, g.intermediateInfo
+	}
 }
