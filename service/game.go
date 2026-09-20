@@ -183,6 +183,15 @@ func (g *GameService) GetGameResult() (error, *GameResult) {
 	}
 }
 
+/*
+GetState возвращает состояние игры
+*/
+func (g *GameService) GetState() GameState {
+	g.mtx.Lock()
+	defer g.mtx.Unlock()
+	return g.state
+}
+
 //==================================================
 
 type GameResult struct {
