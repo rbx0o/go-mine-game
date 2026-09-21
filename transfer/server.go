@@ -27,8 +27,12 @@ StartServer запускает HTTP сервер
 func (h *HTTPServer) StartServer(hostname string, port string) error {
 	mux := http.NewServeMux()
 
+	// endpoints /game/*
 	mux.HandleFunc("POST /game/start", h.httpHandlers.StartGame)
 	mux.HandleFunc("GET /game/state", h.httpHandlers.GetState)
+
+	// endpoints /enterprise/*
+	mux.HandleFunc("GET /enterprise/info", h.httpHandlers.GetIntermediateEnterpriseInfo)
 
 	addr := fmt.Sprintf("%v:%v", hostname, port)
 	err := http.ListenAndServe(addr, mux)
