@@ -6,6 +6,12 @@ info:
 http:
   method: POST
   url: "{{baseUrl}}/miners"
+  body:
+    type: json
+    data: |-
+      {
+        "type": "small_miner"
+      }
   auth: inherit
 
 settings:

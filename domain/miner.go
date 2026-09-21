@@ -47,10 +47,10 @@ type Miner interface {
 	Run(context.Context, *sync.WaitGroup) <-chan Coal
 
 	/*
-		GetInfo() возвращает информацию о шахтёре.
+		Info() возвращает информацию о шахтёре.
 		По сути просто возвращает копию поля info шахтёра
 	*/
-	GetInfo() MinerInfo
+	Info() MinerInfo
 }
 
 //==================================================
@@ -72,7 +72,7 @@ func InitMinerInfo(id ID, energy int, minerType MinerType) MinerInfo {
 //==================================================
 
 type SmallMiner struct {
-	ID        ID            // ID шахтёра
+	id        ID            // ID шахтёра
 	salary    Coal          // Оплата труда - 5
 	energy    int           // Энергия - 30
 	coalCount Coal          // За одну добычу - 1
@@ -90,7 +90,7 @@ func InitSmallMiner() (*SmallMiner, error) {
 	}
 
 	return &SmallMiner{
-		ID:        id,
+		id:        id,
 		salary:    minerConfigs[SmallMinerType].Salary,
 		energy:    minerConfigs[SmallMinerType].Energy,
 		coalCount: minerConfigs[SmallMinerType].CoalCount,
@@ -100,7 +100,7 @@ func InitSmallMiner() (*SmallMiner, error) {
 	}, nil
 }
 
-func (m *SmallMiner) GetInfo() MinerInfo {
+func (m *SmallMiner) Info() MinerInfo {
 	m.mtx.Lock()
 	defer m.mtx.Unlock()
 
@@ -136,7 +136,7 @@ func (m *SmallMiner) Run(ctx context.Context, wg *sync.WaitGroup) <-chan Coal {
 //==================================================
 
 type NormalMiner struct {
-	ID        ID            // ID шахтёра
+	id        ID            // ID шахтёра
 	salary    Coal          // Оплата труда - 50
 	energy    int           // Энергия - 45
 	coalCount Coal          // За одну добычу - 3
@@ -154,7 +154,7 @@ func InitNormalMiner() (*NormalMiner, error) {
 	}
 
 	return &NormalMiner{
-		ID:        id,
+		id:        id,
 		salary:    minerConfigs[NormalMinerType].Salary,
 		energy:    minerConfigs[NormalMinerType].Energy,
 		coalCount: minerConfigs[NormalMinerType].CoalCount,
@@ -164,7 +164,7 @@ func InitNormalMiner() (*NormalMiner, error) {
 	}, nil
 }
 
-func (m *NormalMiner) GetInfo() MinerInfo {
+func (m *NormalMiner) Info() MinerInfo {
 	m.mtx.Lock()
 	defer m.mtx.Unlock()
 
@@ -200,7 +200,7 @@ func (m *NormalMiner) Run(ctx context.Context, wg *sync.WaitGroup) <-chan Coal {
 //==================================================
 
 type StrongMiner struct {
-	ID        ID            // ID шахтёра
+	id        ID            // ID шахтёра
 	salary    Coal          // Оплата труда - 450
 	energy    int           // Энергия - 60
 	coalCount Coal          // За одну добычу - 10
@@ -219,7 +219,7 @@ func InitStrongMiner() (*StrongMiner, error) {
 	}
 
 	return &StrongMiner{
-		ID:        id,
+		id:        id,
 		salary:    minerConfigs[StrongMinerType].Salary,
 		energy:    minerConfigs[StrongMinerType].Energy,
 		coalCount: minerConfigs[StrongMinerType].CoalCount,
@@ -230,7 +230,7 @@ func InitStrongMiner() (*StrongMiner, error) {
 	}, nil
 }
 
-func (m *StrongMiner) GetInfo() MinerInfo {
+func (m *StrongMiner) Info() MinerInfo {
 	m.mtx.Lock()
 	defer m.mtx.Unlock()
 

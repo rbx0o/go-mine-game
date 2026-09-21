@@ -60,7 +60,7 @@ func (g *GameService) HireMiner(minerType domain.MinerType) (error, domain.Miner
 	chCoal = miner.Run(g.minerCtx, wg)
 
 	g.enterprise.Mtx.Lock()
-	g.enterprise.ActiveMiners[miner.GetInfo().ID] = miner
+	g.enterprise.ActiveMiners[miner.Info().ID] = miner
 	g.enterprise.Mtx.Unlock()
 
 	go func() {
@@ -76,8 +76,8 @@ func (g *GameService) HireMiner(minerType domain.MinerType) (error, domain.Miner
 
 		wg.Wait()
 		g.enterprise.Mtx.Lock()
-		g.enterprise.InactiveMiners[miner.GetInfo().ID] = miner
-		delete(g.enterprise.ActiveMiners, miner.GetInfo().ID)
+		g.enterprise.InactiveMiners[miner.Info().ID] = miner
+		delete(g.enterprise.ActiveMiners, miner.Info().ID)
 		g.enterprise.Mtx.Unlock()
 		g.wg.Done()
 	}()
@@ -128,7 +128,7 @@ func (g *GameService) GetActiveMinersFilter(minerType domain.MinerType) map[doma
 	result := make(map[domain.ID]domain.Miner, len(g.enterprise.ActiveMiners))
 
 	for key, value := range g.enterprise.ActiveMiners {
-		if value.GetInfo().MinerType == minerType {
+		if value.Info().MinerType == minerType {
 			result[key] = value
 		}
 	}
@@ -147,7 +147,7 @@ func (g *GameService) GetInactiveMinersFilter(minerType domain.MinerType) map[do
 	result := make(map[domain.ID]domain.Miner, len(g.enterprise.InactiveMiners))
 
 	for key, value := range g.enterprise.InactiveMiners {
-		if value.GetInfo().MinerType == minerType {
+		if value.Info().MinerType == minerType {
 			result[key] = value
 		}
 	}

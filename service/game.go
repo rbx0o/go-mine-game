@@ -211,8 +211,8 @@ func (g *GameService) GetGameResult() (error, *GameResult) {
 
 type IntermediateInfo struct {
 	Balance        domain.Coal
-	ActiveMiners   map[domain.ID]domain.Miner
-	InactiveMiners map[domain.ID]domain.Miner
+	ActiveMiners   map[domain.ID]domain.MinerInfo
+	InactiveMiners map[domain.ID]domain.MinerInfo
 	EquipmentInfo  map[domain.EquipmentType]bool
 }
 
@@ -237,15 +237,15 @@ func (g *GameService) GetIntermediateInfo() (error, *IntermediateInfo) {
 
 		info.Balance = g.enterprise.Balance
 
-		activeMiners := make(map[domain.ID]domain.Miner, len(g.enterprise.ActiveMiners))
+		activeMiners := make(map[domain.ID]domain.MinerInfo, len(g.enterprise.ActiveMiners))
 		for key, value := range g.enterprise.ActiveMiners {
-			activeMiners[key] = value
+			activeMiners[key] = value.Info()
 		}
 		info.ActiveMiners = activeMiners
 
-		inactiveMiners := make(map[domain.ID]domain.Miner, len(g.enterprise.InactiveMiners))
+		inactiveMiners := make(map[domain.ID]domain.MinerInfo, len(g.enterprise.InactiveMiners))
 		for key, value := range g.enterprise.InactiveMiners {
-			inactiveMiners[key] = value
+			inactiveMiners[key] = value.Info()
 		}
 		info.InactiveMiners = inactiveMiners
 

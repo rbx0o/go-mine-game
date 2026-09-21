@@ -78,6 +78,10 @@ func (id ID) String() string {
 	return uuid.UUID(id).String()
 }
 
+func (id ID) MarshalText() ([]byte, error) {
+	return []byte(id.String()), nil
+}
+
 /*
 IsZero() проверяет ID на нулевое значение
 */
