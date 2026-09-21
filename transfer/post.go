@@ -70,10 +70,10 @@ func (h *HTTPHandlers) HireMiner(response http.ResponseWriter, request *http.Req
 	dto := MinerTypeDTO{}
 	if err := GetFromJSON(request, &dto); err != nil {
 		dtoError := ErrorResponseDTO{
-			Error: err.Error(),
+			Error: errors.New("The request body must contain valid JSON").Error(),
 			Time:  time.Now(),
 		}
-		SendJSON(response, dtoError, http.StatusInternalServerError)
+		SendJSON(response, dtoError, http.StatusBadRequest)
 		return
 	}
 
@@ -102,8 +102,15 @@ func (h *HTTPHandlers) HireMiner(response http.ResponseWriter, request *http.Req
 		}
 		SendJSON(response, dtoError, http.StatusConflict)
 		return
+	case service.GameNotRunningYet, service.GameAlreadyFinished:
+		dtoError := ErrorResponseDTO{
+			Error: err.Error(),
+			Time:  time.Now(),
+		}
+		SendJSON(response, dtoError, http.StatusConflict)
+		return
 	case nil:
-		dtoSuccess := SuccessResponseDTO[domain.Miner]{
+		dtoSuccess := SuccessResponseDTO[domain.MinerInfo]{
 			Data:    &miner,
 			Message: "The miner has been successfully hired!",
 			Time:    time.Now(),

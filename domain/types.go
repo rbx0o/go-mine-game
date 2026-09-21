@@ -78,6 +78,11 @@ func (id ID) String() string {
 	return uuid.UUID(id).String()
 }
 
+/*
+MarshalText() возвращает массив байт из ID
+
+При помощи данного метода идёт реализация интерфейса TextMarshaler
+*/
 func (id ID) MarshalText() ([]byte, error) {
 	return []byte(id.String()), nil
 }

@@ -11,6 +11,8 @@ http:
     data: |-
       {
         "type": "small_miner"
+        //"type": "normal_miner"
+        //"type": "strong_miner"  
       }
   auth: inherit
 

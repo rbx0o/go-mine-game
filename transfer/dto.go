@@ -45,7 +45,7 @@ func SendJSON(response http.ResponseWriter, dto any, status int) {
 /*
 GetJSON получение body из запроса и запись в переданную DTO
 */
-func GetFromJSON(request *http.Request, dto any) error {
+func GetFromJSON[T any](request *http.Request, dto *T) error {
 	body, err := io.ReadAll(request.Body)
 	if err != nil {
 		return err

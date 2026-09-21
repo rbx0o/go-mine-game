@@ -25,11 +25,18 @@ func (g *GameService) GetMinerTypesInfo() map[domain.MinerType]domain.MinerConfi
 /*
 HireMiner() нанимает шахтёра на работу
 */
-func (g *GameService) HireMiner(minerType domain.MinerType) (error, domain.Miner) {
+func (g *GameService) HireMiner(minerType domain.MinerType) (error, domain.MinerInfo) {
 	var miner domain.Miner
 	var chCoal <-chan domain.Coal
 	var wg = &sync.WaitGroup{}
 	var err error
+
+	switch g.state {
+	case Created:
+		return GameNotRunningYet, domain.MinerInfo{}
+	case Finished:
+		return GameAlreadyFinished, domain.MinerInfo{}
+	}
 
 	switch minerType {
 	case domain.SmallMinerType:
@@ -43,13 +50,13 @@ func (g *GameService) HireMiner(minerType domain.MinerType) (error, domain.Miner
 	}
 
 	if err != nil {
-		return err, nil
+		return err, domain.MinerInfo{}
 	}
 
 	g.enterprise.Mtx.Lock()
 	if g.enterprise.Balance < domain.GetMinerConfigs()[minerType].Salary {
 		g.enterprise.Mtx.Unlock()
-		return NotEnoughCoal, nil
+		return NotEnoughCoal, domain.MinerInfo{}
 	} else {
 		g.enterprise.Balance -= domain.GetMinerConfigs()[minerType].Salary
 		g.enterprise.Mtx.Unlock()
@@ -82,7 +89,7 @@ func (g *GameService) HireMiner(minerType domain.MinerType) (error, domain.Miner
 		g.wg.Done()
 	}()
 
-	return nil, miner
+	return nil, miner.Info()
 }
 
 /*
