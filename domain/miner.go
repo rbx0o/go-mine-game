@@ -56,9 +56,9 @@ type Miner interface {
 //==================================================
 
 type MinerInfo struct {
-	ID         ID        // ID шахтёра
-	EnergyLeft int       // Сколько энергии осталось
-	MinerType  MinerType // Тип шахтёра
+	ID         ID        `json:"id"`          // ID шахтёра
+	EnergyLeft int       `json:"energy_left"` // Сколько энергии осталось
+	MinerType  MinerType `json:"type"`        // Тип шахтёра
 }
 
 func InitMinerInfo(id ID, energy int, minerType MinerType) MinerInfo {

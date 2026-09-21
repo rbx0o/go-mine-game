@@ -59,7 +59,7 @@ method:		POST
 info:		-
 
 succeed:
-  - status code:	200 OK
+  - status code:	201 Created
   - response body:	Miner hire successfully + time
 
 failed:
