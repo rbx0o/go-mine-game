@@ -39,10 +39,10 @@ info:		-
 
 succeed:
   - status code:	200 OK
-  - response body:	JSON game status + time
+  - response body:	JSON enterprise info + time
 
 failed:
-  - status code:	500 InternalServerError
+  - status code:	409 Conflict, 500 InternalServerError
   - response body: 	JSON with error + time
 */
 func (h *HTTPHandlers) GetIntermediateEnterpriseInfo(response http.ResponseWriter, request *http.Request) {

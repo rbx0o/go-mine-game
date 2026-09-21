@@ -1,9 +1,11 @@
 package transfer
 
 import (
+	"errors"
 	"net/http"
 	"time"
 
+	"github.com/rbx0o/go-mine-game/domain"
 	"github.com/rbx0o/go-mine-game/service"
 )
 
@@ -47,6 +49,73 @@ func (h *HTTPHandlers) StartGame(response http.ResponseWriter, request *http.Req
 			Time:  time.Now(),
 		}
 		SendJSON(response, dto, http.StatusInternalServerError)
+		return
+	}
+}
+
+/*
+pattern:	/miners
+method:		POST
+info:		-
+
+succeed:
+  - status code:	200 OK
+  - response body:	Miner hire successfully + time
+
+failed:
+  - status code:	400 Bad Request, 409 Conflict, 500 InternalServerError
+  - response body: 	JSON with error + time
+*/
+func (h *HTTPHandlers) HireMiner(response http.ResponseWriter, request *http.Request) {
+	dto := MinerTypeDTO{}
+	if err := GetFromJSON(request, &dto); err != nil {
+		dtoError := ErrorResponseDTO{
+			Error: err.Error(),
+			Time:  time.Now(),
+		}
+		SendJSON(response, dtoError, http.StatusInternalServerError)
+		return
+	}
+
+	if dto.Type == "" {
+		dtoError := ErrorResponseDTO{
+			Error: errors.New("The field type is required").Error(),
+			Time:  time.Now(),
+		}
+		SendJSON(response, dtoError, http.StatusBadRequest)
+		return
+	}
+
+	err, miner := h.gameService.HireMiner(domain.MinerType(dto.Type))
+	switch err {
+	case service.MinerTypeNotFound:
+		dtoError := ErrorResponseDTO{
+			Error: err.Error(),
+			Time:  time.Now(),
+		}
+		SendJSON(response, dtoError, http.StatusBadRequest)
+		return
+	case service.NotEnoughCoal:
+		dtoError := ErrorResponseDTO{
+			Error: err.Error(),
+			Time:  time.Now(),
+		}
+		SendJSON(response, dtoError, http.StatusConflict)
+		return
+	case nil:
+		dtoSuccess := SuccessResponseDTO[domain.Miner]{
+			Data:    &miner,
+			Message: "The miner has been successfully hired!",
+			Time:    time.Now(),
+		}
+		SendJSON(response, dtoSuccess, http.StatusCreated)
+		return
+	default:
+		dtoError := ErrorResponseDTO{
+			Error: err.Error(),
+			Time:  time.Now(),
+		}
+		SendJSON(response, dtoError, http.StatusInternalServerError)
 		return
 	}
 }

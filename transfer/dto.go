@@ -3,6 +3,7 @@ package transfer
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"time"
 )
@@ -16,6 +17,10 @@ type SuccessResponseDTO[T any] struct {
 	Data    *T        `json:"data,omitempty"`
 	Message string    `json:"message,omitempty"`
 	Time    time.Time `json:"time"`
+}
+
+type MinerTypeDTO struct {
+	Type string `json:"type"`
 }
 
 /*
@@ -35,4 +40,21 @@ func SendJSON(response http.ResponseWriter, dto any, status int) {
 		fmt.Printf("HTTP write header error: %v", err)
 		return
 	}
+}
+
+/*
+GetJSON получение body из запроса и запись в переданную DTO
+*/
+func GetFromJSON(request *http.Request, dto any) error {
+	body, err := io.ReadAll(request.Body)
+	if err != nil {
+		return err
+	}
+
+	err = json.Unmarshal(body, dto)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
