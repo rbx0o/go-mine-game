@@ -6,6 +6,8 @@ import (
 	"io"
 	"net/http"
 	"time"
+
+	"github.com/rbx0o/go-mine-game/domain"
 )
 
 type ErrorResponseDTO struct {
@@ -21,6 +23,16 @@ type SuccessResponseDTO[T any] struct {
 
 type MinerTypeDTO struct {
 	Type string `json:"type"`
+}
+
+type GameResultDTO struct {
+	Balance         domain.Coal                    `json:"balance"`
+	StartTime       time.Time                      `json:"start_time"`
+	EndTime         time.Time                      `json:"end_time"`
+	DurationTime    float64                        `json:"duration_time"`
+	EndedAuto       bool                           `json:"ended_time"`
+	ResultEquipment map[domain.EquipmentType]bool  `json:"result_equipment"`
+	ResultMiners    map[domain.ID]domain.MinerInfo `json:"result_miners"`
 }
 
 /*

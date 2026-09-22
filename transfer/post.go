@@ -78,8 +78,18 @@ func (h *HTTPHandlers) StopGame(response http.ResponseWriter, request *http.Requ
 		SendJSON(response, dto, http.StatusConflict)
 		return
 	case nil:
-		dto := SuccessResponseDTO[service.GameResult]{
-			Data:    result,
+		tempDTO := GameResultDTO{
+			Balance:         result.Balance,
+			StartTime:       result.StartTime,
+			EndTime:         result.EndTime,
+			DurationTime:    result.DurationTime.Seconds(),
+			EndedAuto:       result.EndedAuto,
+			ResultEquipment: result.ResultEquipment,
+			ResultMiners:    result.ResultMiners,
+		}
+
+		dto := SuccessResponseDTO[GameResultDTO]{
+			Data:    &tempDTO,
 			Message: "Game stopped successfully",
 			Time:    time.Now(),
 		}
