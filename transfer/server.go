@@ -29,6 +29,7 @@ func (h *HTTPServer) StartServer(hostname string, port string) error {
 
 	// endpoints /game/*
 	mux.HandleFunc("POST /game/start", h.httpHandlers.StartGame)
+	mux.HandleFunc("POST /game/stop", h.httpHandlers.StopGame)
 	mux.HandleFunc("GET /game/state", h.httpHandlers.GetState)
 
 	// endpoints /enterprise/*
