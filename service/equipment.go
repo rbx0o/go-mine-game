@@ -16,22 +16,31 @@ import (
 BuyEquipment
 совершает покупку оборудования
 */
-func (g *GameService) BuyEquipment(equipment domain.EquipmentType) error {
+func (g *GameService) BuyEquipment(equipment domain.EquipmentType) (error, *domain.EquipmentInfo) {
 	g.enterprise.Mtx.Lock()
+
+	switch g.state {
+	case Finished:
+		g.enterprise.Mtx.Unlock()
+		return GameAlreadyFinished, nil
+	case Created:
+		g.enterprise.Mtx.Unlock()
+		return GameNotRunningYet, nil
+	}
 
 	if equipment != domain.PickaxeType &&
 		equipment != domain.VentilationType &&
 		equipment != domain.TrolleysType {
 		g.enterprise.Mtx.Unlock()
-		return EquipmentTypeNotFound
+		return EquipmentTypeNotFound, nil
 	}
 	if g.enterprise.AllEquipment[equipment].IsBought() {
 		g.enterprise.Mtx.Unlock()
-		return EquipmentAlreadyBought
+		return EquipmentAlreadyBought, nil
 	}
 	if (g.enterprise.Balance - g.enterprise.AllEquipment[equipment].Cost()) < 0 {
 		g.enterprise.Mtx.Unlock()
-		return NotEnoughCoal
+		return NotEnoughCoal, nil
 	}
 
 	g.enterprise.AllEquipment[equipment].Buy()
@@ -45,7 +54,8 @@ func (g *GameService) BuyEquipment(equipment domain.EquipmentType) error {
 		g.finishGame(true)
 	}
 
-	return nil
+	eqInfo := g.enterprise.AllEquipment[equipment].GetInfo()
+	return nil, &eqInfo
 }
 
 /*
