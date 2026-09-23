@@ -29,8 +29,8 @@ type GameResultDTO struct {
 	Balance         domain.Coal                    `json:"balance"`
 	StartTime       time.Time                      `json:"start_time"`
 	EndTime         time.Time                      `json:"end_time"`
-	DurationTime    float64                        `json:"duration_time"`
-	EndedAuto       bool                           `json:"ended_time"`
+	DurationTime    int                            `json:"duration_time_seconds"`
+	EndedAuto       bool                           `json:"ended_auto"`
 	ResultEquipment map[domain.EquipmentType]bool  `json:"result_equipment"`
 	ResultMiners    map[domain.ID]domain.MinerInfo `json:"result_miners"`
 }

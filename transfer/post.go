@@ -2,6 +2,7 @@ package transfer
 
 import (
 	"errors"
+	"math"
 	"net/http"
 	"time"
 
@@ -82,7 +83,7 @@ func (h *HTTPHandlers) StopGame(response http.ResponseWriter, request *http.Requ
 			Balance:         result.Balance,
 			StartTime:       result.StartTime,
 			EndTime:         result.EndTime,
-			DurationTime:    result.DurationTime.Seconds(),
+			DurationTime:    int(math.Round(result.DurationTime.Seconds())),
 			EndedAuto:       result.EndedAuto,
 			ResultEquipment: result.ResultEquipment,
 			ResultMiners:    result.ResultMiners,
