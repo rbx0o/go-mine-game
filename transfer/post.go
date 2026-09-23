@@ -193,7 +193,7 @@ failed:
   - status code:	409 Conflict, 500 InternalServerError
   - response body: 	JSON with error + time
 */
-func (h *HTTPHandlers) BuqEquipment(response http.ResponseWriter, request *http.Request) {
+func (h *HTTPHandlers) BuyEquipment(response http.ResponseWriter, request *http.Request) {
 	dto := TypeDTO{}
 	if err := GetFromJSON(request, &dto); err != nil {
 		dtoError := ErrorResponseDTO{

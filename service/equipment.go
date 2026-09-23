@@ -18,6 +18,8 @@ BuyEquipment
 */
 func (g *GameService) BuyEquipment(equipment domain.EquipmentType) (error, *domain.EquipmentInfo) {
 	g.enterprise.Mtx.Lock()
+	g.mtx.Lock()
+	g.mtx.Unlock()
 
 	switch g.state {
 	case Finished:

@@ -22,8 +22,8 @@ type Equipment interface {
 }
 
 type EquipmentInfo struct {
-	Name string `json:"name"`
-	Cost Coal   `json:"cost"`
+	Name string
+	Cost Coal
 }
 
 //==================================================
