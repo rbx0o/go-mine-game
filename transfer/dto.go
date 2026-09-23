@@ -35,6 +35,14 @@ type GameResultDTO struct {
 	ResultMiners    map[domain.ID]domain.MinerInfo `json:"result_miners"`
 }
 
+type MinerConfigDTO struct {
+	Salary    domain.Coal `json:"salary"`
+	Energy    int         `json:"energy"`
+	CoalCount domain.Coal `json:"coal_count"`
+	Timeout   int         `json:"timeout_seconds"`
+	Progress  domain.Coal `json:"progress"`
+}
+
 /*
 SendJSON конвертирует dto в JSON и пытается отправить с указанным статус кодом
 */
