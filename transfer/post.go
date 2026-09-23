@@ -120,7 +120,7 @@ failed:
   - response body: 	JSON with error + time
 */
 func (h *HTTPHandlers) HireMiner(response http.ResponseWriter, request *http.Request) {
-	dto := MinerTypeDTO{}
+	dto := TypeDTO{}
 	if err := GetFromJSON(request, &dto); err != nil {
 		dtoError := ErrorResponseDTO{
 			Error: errors.New("The request body must contain valid JSON").Error(),
@@ -169,6 +169,80 @@ func (h *HTTPHandlers) HireMiner(response http.ResponseWriter, request *http.Req
 			Time:    time.Now(),
 		}
 		SendJSON(response, dtoSuccess, http.StatusCreated)
+		return
+	default:
+		dtoError := ErrorResponseDTO{
+			Error: err.Error(),
+			Time:  time.Now(),
+		}
+		SendJSON(response, dtoError, http.StatusInternalServerError)
+		return
+	}
+}
+
+/*
+pattern:	/equipment
+method:		POST
+info:		-
+
+succeed:
+  - status code:	200 Ok
+  - response body:	JSON equipment + time
+
+failed:
+  - status code:	409 Conflict, 500 InternalServerError
+  - response body: 	JSON with error + time
+*/
+func (h *HTTPHandlers) BuyEquipment(response http.ResponseWriter, request *http.Request) {
+	dto := TypeDTO{}
+	if err := GetFromJSON(request, &dto); err != nil {
+		dtoError := ErrorResponseDTO{
+			Error: errors.New("The request body must contain valid JSON").Error(),
+			Time:  time.Now(),
+		}
+		SendJSON(response, dtoError, http.StatusBadRequest)
+		return
+	}
+
+	if dto.Type == "" {
+		dtoError := ErrorResponseDTO{
+			Error: errors.New("The field type is required").Error(),
+			Time:  time.Now(),
+		}
+		SendJSON(response, dtoError, http.StatusBadRequest)
+		return
+	}
+
+	err, equipment := h.gameService.BuyEquipment(domain.EquipmentType(dto.Type))
+	switch err {
+	case service.EquipmentTypeNotFound:
+		dtoError := ErrorResponseDTO{
+			Error: err.Error(),
+			Time:  time.Now(),
+		}
+		SendJSON(response, dtoError, http.StatusBadRequest)
+		return
+	case service.EquipmentAlreadyBought, service.NotEnoughCoal:
+		dtoError := ErrorResponseDTO{
+			Error: err.Error(),
+			Time:  time.Now(),
+		}
+		SendJSON(response, dtoError, http.StatusConflict)
+		return
+	case service.GameAlreadyFinished, service.GameNotRunningYet:
+		dtoError := ErrorResponseDTO{
+			Error: err.Error(),
+			Time:  time.Now(),
+		}
+		SendJSON(response, dtoError, http.StatusConflict)
+		return
+	case nil:
+		dtoSuccess := SuccessResponseDTO[domain.EquipmentInfo]{
+			Data:    equipment,
+			Message: "",
+			Time:    time.Now(),
+		}
+		SendJSON(response, dtoSuccess, http.StatusOK)
 		return
 	default:
 		dtoError := ErrorResponseDTO{

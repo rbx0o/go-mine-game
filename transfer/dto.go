@@ -21,7 +21,7 @@ type SuccessResponseDTO[T any] struct {
 	Time    time.Time `json:"time"`
 }
 
-type MinerTypeDTO struct {
+type TypeDTO struct {
 	Type string `json:"type"`
 }
 
