@@ -83,9 +83,16 @@ func (g *GameService) GetEquipmentTypesInfo() map[domain.EquipmentType]domain.Eq
 GetEquipmentInfo
 возвращает информацию о том какое оборудование куплено/не куплено
 */
-func (g *GameService) GetEquipmentInfo() map[domain.EquipmentType]bool {
+func (g *GameService) GetEquipmentInfo() (error, map[domain.EquipmentType]bool) {
 	g.enterprise.Mtx.RLock()
 	defer g.enterprise.Mtx.RUnlock()
+
+	switch g.state {
+	case Created:
+		return GameNotRunningYet, nil
+	case Finished:
+		return GameAlreadyFinished, nil
+	}
 
 	result := make(map[domain.EquipmentType]bool, len(g.enterprise.AllEquipment))
 
@@ -93,7 +100,7 @@ func (g *GameService) GetEquipmentInfo() map[domain.EquipmentType]bool {
 		result[key] = g.enterprise.AllEquipment[key].IsBought()
 	}
 
-	return result
+	return nil, result
 }
 
 /*
