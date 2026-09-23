@@ -140,9 +140,9 @@ func (g *GameService) finishGame(endedAuto bool) (error, *GameResult) {
 		}
 		g.gameResult.ResultEquipment = resultEquipment
 
-		resultMiners := make(map[domain.ID]domain.Miner, len(g.enterprise.InactiveMiners))
+		resultMiners := make(map[domain.ID]domain.MinerInfo, len(g.enterprise.InactiveMiners))
 		for key, value := range g.enterprise.InactiveMiners {
-			resultMiners[key] = value
+			resultMiners[key] = value.Info()
 		}
 		g.gameResult.ResultMiners = resultMiners
 
@@ -186,7 +186,7 @@ type GameResult struct {
 	DurationTime    time.Duration
 	EndedAuto       bool
 	ResultEquipment map[domain.EquipmentType]bool
-	ResultMiners    map[domain.ID]domain.Miner
+	ResultMiners    map[domain.ID]domain.MinerInfo
 }
 
 func InitGameResult() *GameResult {

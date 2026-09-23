@@ -2,6 +2,7 @@ package transfer
 
 import (
 	"errors"
+	"math"
 	"net/http"
 	"time"
 
@@ -39,6 +40,58 @@ func (h *HTTPHandlers) StartGame(response http.ResponseWriter, request *http.Req
 		dto := SuccessResponseDTO[struct{}]{
 			Data:    nil,
 			Message: "Game started successfully",
+			Time:    time.Now(),
+		}
+		SendJSON(response, dto, http.StatusOK)
+		return
+	default:
+		dto := ErrorResponseDTO{
+			Error: err.Error(),
+			Time:  time.Now(),
+		}
+		SendJSON(response, dto, http.StatusInternalServerError)
+		return
+	}
+}
+
+/*
+pattern:	/game/stop
+method:		POST
+info:		-
+
+succeed:
+  - status code:	200 Ok
+  - response body:	Game stopped successfully + time
+
+failed:
+  - status code:	409 Conflict, 500 InternalServerError
+  - response body: 	JSON with error + time
+*/
+func (h *HTTPHandlers) StopGame(response http.ResponseWriter, request *http.Request) {
+	err, result := h.gameService.StopGame()
+
+	switch err {
+	case service.GameAlreadyFinished, service.GameNotRunningYet:
+		dto := ErrorResponseDTO{
+			Error: err.Error(),
+			Time:  time.Now(),
+		}
+		SendJSON(response, dto, http.StatusConflict)
+		return
+	case nil:
+		tempDTO := GameResultDTO{
+			Balance:         result.Balance,
+			StartTime:       result.StartTime,
+			EndTime:         result.EndTime,
+			DurationTime:    int(math.Round(result.DurationTime.Seconds())),
+			EndedAuto:       result.EndedAuto,
+			ResultEquipment: result.ResultEquipment,
+			ResultMiners:    result.ResultMiners,
+		}
+
+		dto := SuccessResponseDTO[GameResultDTO]{
+			Data:    &tempDTO,
+			Message: "Game stopped successfully",
 			Time:    time.Now(),
 		}
 		SendJSON(response, dto, http.StatusOK)
