@@ -152,3 +152,27 @@ func (h *HTTPHandlers) GetEquipment(response http.ResponseWriter, request *http.
 		return
 	}
 }
+
+/*
+pattern:	/equipment/info
+method:		GET
+info:		-
+
+succeed:
+  - status code:	200 OK
+  - response body:	JSON equipment info + time
+
+failed:
+  - status code:	500 InternalServerError
+  - response body: 	JSON with error + time
+*/
+func (h *HTTPHandlers) GetEquipmentInfo(response http.ResponseWriter, request *http.Request) {
+	result := h.gameService.GetEquipmentTypesInfo()
+
+	dto := SuccessResponseDTO[map[domain.EquipmentType]domain.EquipmentInfo]{
+		Data:    &result,
+		Message: "",
+		Time:    time.Now(),
+	}
+	SendJSON(response, dto, http.StatusOK)
+}

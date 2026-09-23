@@ -42,6 +42,7 @@ func (h *HTTPServer) StartServer(hostname string, port string) error {
 	// endpoints /equipment/*
 	mux.HandleFunc("POST /equipment", h.httpHandlers.BuyEquipment)
 	mux.HandleFunc("GET /equipment", h.httpHandlers.GetEquipment)
+	mux.HandleFunc("GET /equipment/info", h.httpHandlers.GetEquipmentInfo)
 
 	addr := fmt.Sprintf("%v:%v", hostname, port)
 	err := http.ListenAndServe(addr, mux)
