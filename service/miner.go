@@ -96,6 +96,34 @@ func (g *GameService) HireMiner(minerType domain.MinerType) (error, domain.Miner
 }
 
 /*
+GetAllMiners возвращает список всех шахтёров
+*/
+func (g *GameService) GetAllMiners() (error, map[domain.ID]domain.MinerInfo) {
+	g.mtx.RLock()
+	defer g.mtx.RUnlock()
+	g.enterprise.Mtx.RLock()
+	defer g.enterprise.Mtx.RUnlock()
+
+	switch g.state {
+	case Created:
+		return GameNotRunningYet, nil
+	case Finished:
+		return GameAlreadyFinished, nil
+	}
+
+	result := make(map[domain.ID]domain.MinerInfo, len(g.enterprise.ActiveMiners)+len(g.enterprise.InactiveMiners))
+
+	for key, value := range g.enterprise.ActiveMiners {
+		result[key] = value.Info()
+	}
+	for key, value := range g.enterprise.InactiveMiners {
+		result[key] = value.Info()
+	}
+
+	return nil, result
+}
+
+/*
 GetActiveMiners() возвращает копию map всех работающих в данный момент шахтёров
 */
 func (g *GameService) GetActiveMiners() map[domain.ID]domain.Miner {
