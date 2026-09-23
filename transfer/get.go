@@ -112,6 +112,48 @@ func (h *HTTPHandlers) GetMinersInfo(response http.ResponseWriter, request *http
 }
 
 /*
+pattern:	/miners/all
+method:		GET
+info:		-
+
+succeed:
+  - status code:	200 OK
+  - response body:	JSON miners info + time
+
+failed:
+  - status code:	500 InternalServerError
+  - response body: 	JSON with error + time
+*/
+func (h *HTTPHandlers) GetAllMiners(response http.ResponseWriter, request *http.Request) {
+	err, result := h.gameService.GetAllMiners()
+
+	switch err {
+	case service.GameNotRunningYet, service.GameAlreadyFinished:
+		dto := ErrorResponseDTO{
+			Error: err.Error(),
+			Time:  time.Now(),
+		}
+		SendJSON(response, dto, http.StatusConflict)
+		return
+	case nil:
+		dto := SuccessResponseDTO[map[domain.ID]domain.MinerInfo]{
+			Data:    &result,
+			Message: "",
+			Time:    time.Now(),
+		}
+		SendJSON(response, dto, http.StatusOK)
+		return
+	default:
+		dto := ErrorResponseDTO{
+			Error: err.Error(),
+			Time:  time.Now(),
+		}
+		SendJSON(response, dto, http.StatusInternalServerError)
+		return
+	}
+}
+
+/*
 pattern:	/equipment
 method:		GET
 info:		-
