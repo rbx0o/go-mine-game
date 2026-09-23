@@ -17,16 +17,16 @@ BuyEquipment
 совершает покупку оборудования
 */
 func (g *GameService) BuyEquipment(equipment domain.EquipmentType) (error, *domain.EquipmentInfo) {
-	g.mtx.Lock()
+	g.mtx.RLock()
 	g.enterprise.Mtx.Lock()
 
 	switch g.state {
 	case Finished:
-		g.mtx.Unlock()
+		g.mtx.RUnlock()
 		g.enterprise.Mtx.Unlock()
 		return GameAlreadyFinished, nil
 	case Created:
-		g.mtx.Unlock()
+		g.mtx.RUnlock()
 		g.enterprise.Mtx.Unlock()
 		return GameNotRunningYet, nil
 	}
@@ -34,17 +34,17 @@ func (g *GameService) BuyEquipment(equipment domain.EquipmentType) (error, *doma
 	if equipment != domain.PickaxeType &&
 		equipment != domain.VentilationType &&
 		equipment != domain.TrolleysType {
-		g.mtx.Unlock()
+		g.mtx.RUnlock()
 		g.enterprise.Mtx.Unlock()
 		return EquipmentTypeNotFound, nil
 	}
 	if g.enterprise.AllEquipment[equipment].IsBought() {
-		g.mtx.Unlock()
+		g.mtx.RUnlock()
 		g.enterprise.Mtx.Unlock()
 		return EquipmentAlreadyBought, nil
 	}
 	if (g.enterprise.Balance - g.enterprise.AllEquipment[equipment].Cost()) < 0 {
-		g.mtx.Unlock()
+		g.mtx.RUnlock()
 		g.enterprise.Mtx.Unlock()
 		return NotEnoughCoal, nil
 	}
@@ -54,7 +54,7 @@ func (g *GameService) BuyEquipment(equipment domain.EquipmentType) (error, *doma
 
 	check := g.CheckAllEquipmentIsBought()
 
-	g.mtx.Unlock()
+	g.mtx.RUnlock()
 	g.enterprise.Mtx.Unlock()
 
 	if check {
@@ -84,6 +84,8 @@ GetEquipmentInfo
 возвращает информацию о том какое оборудование куплено/не куплено
 */
 func (g *GameService) GetEquipmentInfo() (error, map[domain.EquipmentType]bool) {
+	g.mtx.RLock()
+	defer g.mtx.RUnlock()
 	g.enterprise.Mtx.RLock()
 	defer g.enterprise.Mtx.RUnlock()
 

@@ -45,7 +45,7 @@ type GameService struct {
 	gameResult *GameResult
 
 	wg    *sync.WaitGroup
-	mtx   sync.Mutex
+	mtx   sync.RWMutex
 	state GameState
 }
 
@@ -69,7 +69,7 @@ func InitGameService() *GameService {
 		gameResult: InitGameResult(),
 
 		wg:    &sync.WaitGroup{},
-		mtx:   sync.Mutex{},
+		mtx:   sync.RWMutex{},
 		state: Created,
 	}
 }
