@@ -37,6 +37,7 @@ func (h *HTTPServer) StartServer(hostname string, port string) error {
 
 	// endpoints /miner/*
 	mux.HandleFunc("POST /miners", h.httpHandlers.HireMiner)
+	mux.HandleFunc("GET /miners/info", h.httpHandlers.GetMinersInfo)
 
 	addr := fmt.Sprintf("%v:%v", hostname, port)
 	err := http.ListenAndServe(addr, mux)

@@ -1,9 +1,11 @@
 package transfer
 
 import (
+	"math"
 	"net/http"
 	"time"
 
+	"github.com/rbx0o/go-mine-game/domain"
 	"github.com/rbx0o/go-mine-game/service"
 )
 
@@ -72,4 +74,39 @@ func (h *HTTPHandlers) GetIntermediateEnterpriseInfo(response http.ResponseWrite
 		SendJSON(response, dto, http.StatusInternalServerError)
 		return
 	}
+}
+
+/*
+pattern:	/miners/info
+method:		GET
+info:		-
+
+succeed:
+  - status code:	200 OK
+  - response body:	JSON miners info + time
+
+failed:
+  - status code:	500 InternalServerError
+  - response body: 	JSON with error + time
+*/
+func (h *HTTPHandlers) GetMinersInfo(response http.ResponseWriter, request *http.Request) {
+	minersInfo := h.gameService.GetMinerTypesInfo()
+
+	result := make(map[domain.MinerType]MinerConfigDTO, len(minersInfo))
+	for key, value := range minersInfo {
+		result[key] = MinerConfigDTO{
+			Salary:    value.Salary,
+			Energy:    value.Energy,
+			CoalCount: value.CoalCount,
+			Timeout:   int(math.Round(value.Timeout.Seconds())),
+			Progress:  value.Progress,
+		}
+	}
+
+	dto := SuccessResponseDTO[map[domain.MinerType]MinerConfigDTO]{
+		Data:    &result,
+		Message: "",
+		Time:    time.Now(),
+	}
+	SendJSON(response, dto, http.StatusOK)
 }
