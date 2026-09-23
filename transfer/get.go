@@ -110,3 +110,45 @@ func (h *HTTPHandlers) GetMinersInfo(response http.ResponseWriter, request *http
 	}
 	SendJSON(response, dto, http.StatusOK)
 }
+
+/*
+pattern:	/equipment
+method:		GET
+info:		-
+
+succeed:
+  - status code:	200 OK
+  - response body:	JSON equipment + time
+
+failed:
+  - status code:	409 Conflict, 500 InternalServerError
+  - response body: 	JSON with error + time
+*/
+func (h *HTTPHandlers) GetEquipment(response http.ResponseWriter, request *http.Request) {
+	err, result := h.gameService.GetEquipmentInfo()
+
+	switch err {
+	case service.GameNotRunningYet, service.GameAlreadyFinished:
+		dto := ErrorResponseDTO{
+			Error: err.Error(),
+			Time:  time.Now(),
+		}
+		SendJSON(response, dto, http.StatusConflict)
+		return
+	case nil:
+		dto := SuccessResponseDTO[map[domain.EquipmentType]bool]{
+			Data:    &result,
+			Message: "",
+			Time:    time.Now(),
+		}
+		SendJSON(response, dto, http.StatusOK)
+		return
+	default:
+		dto := ErrorResponseDTO{
+			Error: err.Error(),
+			Time:  time.Now(),
+		}
+		SendJSON(response, dto, http.StatusInternalServerError)
+		return
+	}
+}
