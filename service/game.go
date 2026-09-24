@@ -200,6 +200,13 @@ func (g *GameService) GetGameResult() (error, *GameResult) {
 	g.mtx.Lock()
 	defer g.mtx.Unlock()
 
+	switch g.state {
+	case Created:
+		return GameNotRunningYet, nil
+	case Running:
+		return GameNotEnd, nil
+	}
+
 	if err := g.ctx.Err(); err == nil {
 		return GameNotEnd, nil
 	} else {
