@@ -35,6 +35,58 @@ func (h *HTTPHandlers) GetState(response http.ResponseWriter, request *http.Requ
 }
 
 /*
+pattern:	/game/state
+method:		GET
+info:		-
+
+succeed:
+  - status code:	200 OK
+  - response body:	JSON game result + time
+
+failed:
+  - status code:	409 Conflict, 500 InternalServerError
+  - response body: 	JSON with error + time
+*/
+func (h *HTTPHandlers) GetGameResult(response http.ResponseWriter, request *http.Request) {
+	err, result := h.gameService.GetGameResult()
+
+	switch err {
+	case service.GameNotRunningYet, service.GameNotEnd:
+		dto := ErrorResponseDTO{
+			Error: err.Error(),
+			Time:  time.Now(),
+		}
+		SendJSON(response, dto, http.StatusConflict)
+		return
+	case nil:
+		tempDTO := GameResultDTO{
+			Balance:         result.Balance,
+			StartTime:       result.StartTime,
+			EndTime:         result.EndTime,
+			DurationTime:    int(math.Round(result.DurationTime.Seconds())),
+			EndedAuto:       result.EndedAuto,
+			ResultEquipment: result.ResultEquipment,
+			ResultMiners:    result.ResultMiners,
+		}
+
+		dto := SuccessResponseDTO[GameResultDTO]{
+			Data:    &tempDTO,
+			Message: "",
+			Time:    time.Now(),
+		}
+		SendJSON(response, dto, http.StatusOK)
+		return
+	default:
+		dto := ErrorResponseDTO{
+			Error: err.Error(),
+			Time:  time.Now(),
+		}
+		SendJSON(response, dto, http.StatusInternalServerError)
+		return
+	}
+}
+
+/*
 pattern:	/enterprise/info
 method:		GET
 info:		-
