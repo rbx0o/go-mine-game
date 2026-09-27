@@ -143,6 +143,8 @@ func (g *GameService) GetActiveMiners() map[domain.ID]domain.Miner {
 GetInactiveMiners() возвращает копию map шахтёров закончивших работу
 */
 func (g *GameService) GetInactiveMiners() (error, map[domain.ID]domain.MinerInfo) {
+	g.mtx.RLock()
+	defer g.mtx.RUnlock()
 	g.enterprise.Mtx.RLock()
 	defer g.enterprise.Mtx.RUnlock()
 
@@ -186,6 +188,8 @@ GetInactiveMinersFilter() возвращает копию map шахтёров �
 отфильтрованных по классу шахтёра
 */
 func (g *GameService) GetInactiveMinersFilter(minerType domain.MinerType) (error, map[domain.ID]domain.MinerInfo) {
+	g.mtx.RLock()
+	defer g.mtx.RUnlock()
 	g.enterprise.Mtx.RLock()
 	defer g.enterprise.Mtx.RUnlock()
 

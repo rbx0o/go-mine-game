@@ -227,7 +227,7 @@ func (h *HTTPHandlers) GetInactiveMiners(response http.ResponseWriter, request *
 				Error: "The query must contain valid parameter",
 				Time:  time.Now(),
 			}
-			SendJSON(response, errorDTO, http.StatusConflict)
+			SendJSON(response, errorDTO, http.StatusBadRequest)
 			return
 		} else {
 			err, inactiveMiners := h.gameService.GetInactiveMinersFilter(domain.MinerType(minerType))
