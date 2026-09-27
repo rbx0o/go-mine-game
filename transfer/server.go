@@ -40,6 +40,7 @@ func (h *HTTPServer) StartServer(hostname string, port string) error {
 	mux.HandleFunc("POST /miners", h.httpHandlers.HireMiner)
 	mux.HandleFunc("GET /miners/info", h.httpHandlers.GetMinersInfo)
 	mux.HandleFunc("GET /miners/all", h.httpHandlers.GetAllMiners)
+	mux.HandleFunc("GET /miners/inactive", h.httpHandlers.GetInactiveMiners)
 
 	// endpoints /equipment/*
 	mux.HandleFunc("POST /equipment", h.httpHandlers.BuyEquipment)

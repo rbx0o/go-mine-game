@@ -206,6 +206,96 @@ func (h *HTTPHandlers) GetAllMiners(response http.ResponseWriter, request *http.
 }
 
 /*
+pattern:	/miners/inactive
+method:		GET
+info:		-
+
+succeed:
+  - status code:	200 Ok
+  - response body:	JSON inactive miners + time
+
+failed:
+  - status code:	400 Bad Request, 409 Conflict, 500 InternalServerError
+  - response body: 	JSON with error + time
+*/
+func (h *HTTPHandlers) GetInactiveMiners(response http.ResponseWriter, request *http.Request) {
+	if request.URL.Query().Has("type") {
+		minerType := request.URL.Query().Get("type")
+
+		if minerType == "" {
+			errorDTO := ErrorResponseDTO{
+				Error: "The query must contain valid parameter",
+				Time:  time.Now(),
+			}
+			SendJSON(response, errorDTO, http.StatusBadRequest)
+			return
+		} else {
+			err, inactiveMiners := h.gameService.GetInactiveMinersFilter(domain.MinerType(minerType))
+
+			switch err {
+			case service.GameNotRunningYet, service.GameAlreadyFinished:
+				errorDTO := ErrorResponseDTO{
+					Error: err.Error(),
+					Time:  time.Now(),
+				}
+				SendJSON(response, errorDTO, http.StatusConflict)
+				return
+			case service.MinerTypeNotFound:
+				errorDTO := ErrorResponseDTO{
+					Error: err.Error(),
+					Time:  time.Now(),
+				}
+				SendJSON(response, errorDTO, http.StatusBadRequest)
+				return
+			case nil:
+				successDTO := SuccessResponseDTO[map[domain.ID]domain.MinerInfo]{
+					Data:    &inactiveMiners,
+					Message: "",
+					Time:    time.Now(),
+				}
+				SendJSON(response, successDTO, http.StatusOK)
+				return
+			default:
+				errorDTO := ErrorResponseDTO{
+					Error: err.Error(),
+					Time:  time.Now(),
+				}
+				SendJSON(response, errorDTO, http.StatusInternalServerError)
+				return
+			}
+		}
+
+	} else {
+		err, inactiveMiners := h.gameService.GetInactiveMiners()
+
+		switch err {
+		case service.GameNotRunningYet, service.GameAlreadyFinished:
+			errorDTO := ErrorResponseDTO{
+				Error: err.Error(),
+				Time:  time.Now(),
+			}
+			SendJSON(response, errorDTO, http.StatusConflict)
+			return
+		case nil:
+			successDTO := SuccessResponseDTO[map[domain.ID]domain.MinerInfo]{
+				Data:    &inactiveMiners,
+				Message: "",
+				Time:    time.Now(),
+			}
+			SendJSON(response, successDTO, http.StatusOK)
+			return
+		default:
+			errorDTO := ErrorResponseDTO{
+				Error: err.Error(),
+				Time:  time.Now(),
+			}
+			SendJSON(response, errorDTO, http.StatusInternalServerError)
+			return
+		}
+	}
+}
+
+/*
 pattern:	/equipment
 method:		GET
 info:		-
