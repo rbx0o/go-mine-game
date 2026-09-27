@@ -126,17 +126,26 @@ func (g *GameService) GetAllMiners() (error, map[domain.ID]domain.MinerInfo) {
 /*
 GetActiveMiners() возвращает копию map всех работающих в данный момент шахтёров
 */
-func (g *GameService) GetActiveMiners() map[domain.ID]domain.Miner {
+func (g *GameService) GetActiveMiners() (error, map[domain.ID]domain.MinerInfo) {
+	g.mtx.RLock()
+	defer g.mtx.RUnlock()
 	g.enterprise.Mtx.RLock()
 	defer g.enterprise.Mtx.RUnlock()
 
-	result := make(map[domain.ID]domain.Miner, len(g.enterprise.ActiveMiners))
-
-	for key, value := range g.enterprise.ActiveMiners {
-		result[key] = value
+	switch g.state {
+	case Created:
+		return GameNotRunningYet, nil
+	case Finished:
+		return GameAlreadyFinished, nil
 	}
 
-	return result
+	result := make(map[domain.ID]domain.MinerInfo, len(g.enterprise.ActiveMiners))
+
+	for key, value := range g.enterprise.ActiveMiners {
+		result[key] = value.Info()
+	}
+
+	return nil, result
 }
 
 /*
@@ -168,19 +177,34 @@ func (g *GameService) GetInactiveMiners() (error, map[domain.ID]domain.MinerInfo
 GetActiveMinersFilter() возвращает копию map всех работающих в данный момент шахтёров,
 отфильтрованных по классу шахтёра
 */
-func (g *GameService) GetActiveMinersFilter(minerType domain.MinerType) map[domain.ID]domain.Miner {
+func (g *GameService) GetActiveMinersFilter(minerType domain.MinerType) (error, map[domain.ID]domain.MinerInfo) {
+	g.mtx.RLock()
+	defer g.mtx.RUnlock()
 	g.enterprise.Mtx.RLock()
 	defer g.enterprise.Mtx.RUnlock()
 
-	result := make(map[domain.ID]domain.Miner, len(g.enterprise.ActiveMiners))
+	switch g.state {
+	case Created:
+		return GameNotRunningYet, nil
+	case Finished:
+		return GameAlreadyFinished, nil
+	}
+
+	if minerType != domain.SmallMinerType &&
+		minerType != domain.NormalMinerType &&
+		minerType != domain.StrongMinerType {
+		return MinerTypeNotFound, nil
+	}
+
+	result := make(map[domain.ID]domain.MinerInfo, len(g.enterprise.ActiveMiners))
 
 	for key, value := range g.enterprise.ActiveMiners {
 		if value.Info().MinerType == minerType {
-			result[key] = value
+			result[key] = value.Info()
 		}
 	}
 
-	return result
+	return nil, result
 }
 
 /*
