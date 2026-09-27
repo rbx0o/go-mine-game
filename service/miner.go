@@ -196,6 +196,12 @@ func (g *GameService) GetInactiveMinersFilter(minerType domain.MinerType) (error
 		return GameAlreadyFinished, nil
 	}
 
+	if minerType != domain.SmallMinerType &&
+		minerType != domain.NormalMinerType &&
+		minerType != domain.StrongMinerType {
+		return MinerTypeNotFound, nil
+	}
+
 	result := make(map[domain.ID]domain.MinerInfo, len(g.enterprise.InactiveMiners))
 
 	for key, value := range g.enterprise.InactiveMiners {
