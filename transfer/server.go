@@ -2,7 +2,6 @@ package transfer
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"net/http"
 	"time"
@@ -56,14 +55,15 @@ func NewHTTPServer(httpHandlers *HTTPHandlers, hostname string, port string) *HT
 /*
 StartServer запускает HTTP сервер
 */
-func (h *HTTPServer) StartServer() error {
-	err := h.server.ListenAndServe()
+func (h *HTTPServer) StartServer() <-chan error {
+	errorCh := make(chan error)
 
-	if err != nil && !errors.Is(err, http.ErrServerClosed) {
-		return err
-	}
+	go func() {
+		errorCh <- h.server.ListenAndServe()
+		close(errorCh)
+	}()
 
-	return nil
+	return errorCh
 }
 
 /*
