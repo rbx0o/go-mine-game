@@ -10,8 +10,12 @@ import (
 )
 
 func StopAll(game *service.GameService, server *transfer.HTTPServer) error {
-	game.StopGame()
-	err := server.StopServer()
+	err, _ := game.StopGame()
+	if err != service.GameNotRunningYet && err != service.GameAlreadyFinished {
+		return err
+	}
+
+	err = server.StopServer()
 	if err != nil {
 		return err
 	}
