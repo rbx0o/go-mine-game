@@ -51,7 +51,10 @@ func main() {
 			panic(str)
 		}
 	case <-httpHandlers.StopCh:
-		StopAll(game, server)
+		err := StopAll(game, server)
+		if err != nil {
+			fmt.Printf("Stop game error %v\n", err)
+		}
 	}
 
 	fmt.Println("Game Over")
