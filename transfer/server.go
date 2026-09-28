@@ -56,10 +56,15 @@ func NewHTTPServer(httpHandlers *HTTPHandlers, hostname string, port string) *HT
 StartServer запускает HTTP сервер
 */
 func (h *HTTPServer) StartServer() <-chan error {
-	errorCh := make(chan error)
+	errorCh := make(chan error, 1)
 
 	go func() {
-		errorCh <- h.server.ListenAndServe()
+		err := h.server.ListenAndServe()
+
+		if err != nil && err != http.ErrServerClosed {
+			errorCh <- err
+		}
+
 		close(errorCh)
 	}()
 
