@@ -49,6 +49,9 @@ func NewHTTPServer(httpHandlers *HTTPHandlers, hostname string, port string) *HT
 	mux.HandleFunc("GET /equipment", h.httpHandlers.GetEquipment)
 	mux.HandleFunc("GET /equipment/info", h.httpHandlers.GetEquipmentInfo)
 
+	// endpoints /server/*
+	mux.HandleFunc("POST /server/stop", h.httpHandlers.StopServer)
+
 	return h
 }
 
