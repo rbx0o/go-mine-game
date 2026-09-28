@@ -9,17 +9,32 @@ import (
 	"github.com/rbx0o/go-mine-game/transfer"
 )
 
+var game *service.GameService
+var httpHandlers *transfer.HTTPHandlers
+var server *transfer.HTTPServer
+
+func StopAll() error {
+	err, _ := game.StopGame()
+	if err != nil {
+		return err
+	}
+
+	err = server.StopServer()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func main() {
 	_ = godotenv.Load()
 
-	game := service.InitGameService()
+	game = service.InitGameService()
 	fmt.Println("Game service initialized")
 
-	httpHandlers := transfer.NewHTTPHandlers(game)
+	httpHandlers = transfer.NewHTTPHandlers(game)
 	fmt.Println("HTTP handlers initialized")
-
-	server := transfer.NewHTTPServer(httpHandlers)
-	fmt.Println("HTTP server initialized")
 
 	hostname, ok := os.LookupEnv("HTTP_HOSTNAME")
 	if !ok {
@@ -32,8 +47,11 @@ func main() {
 		return
 	}
 
+	server = transfer.NewHTTPServer(httpHandlers, hostname, port)
+	fmt.Println("HTTP server initialized")
+
 	fmt.Printf("Start HTTP server on %v:%v\n", hostname, port)
-	if err := server.StartServer(hostname, port); err != nil {
+	if err := server.StartServer(); err != nil {
 		str := fmt.Sprintf("HTTP server error %v\n", err)
 		panic(str)
 	}
