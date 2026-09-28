@@ -253,3 +253,27 @@ func (h *HTTPHandlers) BuyEquipment(response http.ResponseWriter, request *http.
 		return
 	}
 }
+
+/*
+pattern:	/server/stop
+method:		POST
+info:		-
+
+succeed:
+  - status code:	200 Ok
+  - response body:	Signal has been sent + time
+
+failed:
+  - status code:	500 InternalServerError
+  - response body: 	JSON with error + time
+*/
+func (h *HTTPHandlers) StopServer(response http.ResponseWriter, request *http.Request) {
+	h.StopCh <- struct{}{}
+
+	dto := SuccessResponseDTO[struct{}]{
+		Data:    nil,
+		Message: "The signal to stop the server has been sent successfully",
+		Time:    time.Now(),
+	}
+	SendJSON(response, dto, http.StatusOK)
+}
